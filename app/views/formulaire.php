@@ -43,7 +43,7 @@ if (isset($_POST['submit'])) {
       <nav>
         <ul>
           <li>
-            <a href="index.php">
+            <a href="http://localhost:81/demande-appui/app/views/formulaire.php">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
             </svg>
@@ -70,11 +70,7 @@ if (isset($_POST['submit'])) {
           </li>
         
           <li>
-<<<<<<< HEAD
             <a href="sfdRegister.php">
-=======
-            <a href="#customization">
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders">
                 <line x1="4" y1="21" x2="4" y2="14" />
                 <line x1="4" y1="10" x2="4" y2="3" />
@@ -89,11 +85,7 @@ if (isset($_POST['submit'])) {
               Enregistrer un SFD</a>
           </li>
           <li>
-<<<<<<< HEAD
             <a href="listeSFD.php">
-=======
-            <a href="#contribute">
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
                 <line x1="8" y1="6" x2="21" y2="6" />
                 <line x1="8" y1="12" x2="21" y2="12" />
@@ -156,22 +148,15 @@ if (isset($_POST['submit'])) {
                   }
 
                   // Récupération des des sfd  depuis la base de données
-<<<<<<< HEAD
+
                   $requeteSfd = "SELECT SigleSFD FROM liste_sfd"; // Remplacez 'table_regions' par le nom réel de votre table
-=======
-                  $requeteSfd = "SELECT Sigles FROM liste_sfd"; // Remplacez 'table_regions' par le nom réel de votre table
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
                   $resultatsfd = $connexion->query($requeteSfd);
 
                   // Génération des options de la liste déroulante
                   if ($resultatsfd->num_rows > 0) {
                       while ($row = $resultatsfd->fetch_assoc()) {
-<<<<<<< HEAD
-                          echo "<option value='" . $row['SigleSFD'] . "'>" . $row['SigleSFD'] . "</option>";
-=======
-                          echo "<option value='" . $row['Sigles'] . "'>" . $row['Sigles'] . "</option>";
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
-                      }
+                          echo "<option value='" . $row['SigleSFD'] . "'>" . $row['SigleSFD'] . "</option>";                      }
+                    
                   }
               ?>
             </select>

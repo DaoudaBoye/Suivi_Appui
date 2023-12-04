@@ -189,15 +189,11 @@ if ($connexion->connect_error) {
                   </div>
                 </div>
               </div>
-<<<<<<< HEAD
-        
             </div>
             <button id="downloadCSV">
-                <i class="fas fa-download"></i> Télécharger la liste des SFD (CSV)
-                </button>
-=======
+              <i class="fas fa-download"></i> Télécharger la liste des SFD (CSV)
+              </button>                          
             </div>
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
           </div>
         </div>
       </section>
@@ -319,11 +315,8 @@ searchInput.addEventListener('input', function() {
     }
 });
 
-<<<<<<< HEAD
 const rowsPerPage = 10; // Nombre de demandes par page
-=======
 const rowsPerPage = 2; // Nombre de demandes par page
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
     let currentPage = 0; // Page actuelle
 
     // Sélectionne l'élément de la table
@@ -381,7 +374,6 @@ const rowsPerPage = 2; // Nombre de demandes par page
 
 
 </script>
-<<<<<<< HEAD
 
 <script>
   // Fonction pour télécharger le contenu en tant que fichier CSV
@@ -421,8 +413,6 @@ const rowsPerPage = 2; // Nombre de demandes par page
     downloadCSV(csvContent, filename); // Télécharge le contenu en tant que fichier CSV
   });
 </script>
-=======
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
 </body>
 </html>
 

@@ -72,50 +72,7 @@
                 }
             }
         }
-<<<<<<< HEAD
-
-
-        public function registerForm() {
-            // Logique pour soumettre le formulaire
-            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
-                // Récupérer les données du formulaire
-                $agrementSFD = $_POST['agrementSFD'];
-                $nomSFD = $_POST['nameSFD'];
-                $sigleSFD = $_POST['sigleSFD'];
-                $contactSFD = $_POST['contactSFD'];
-                // Assurez-vous que le champ 'contactSFD' existe dans le formulaire pour récupérer sa valeur
-                // $contactSFD = $_POST['contactSFD']; // Décommentez cette ligne si le champ est présent dans le formulaire
-                $region = $_POST['region'];
-                $departement = $_POST['departement'];
         
-                // Mettre les données dans un tableau
-                $data = [
-                    'agrementSFD' => $agrementSFD,
-                    'nameSFD' => $nomSFD,
-                    'sigleSFD' => $sigleSFD,
-                    'contactSFD' => $contactSFD,
-                    'region' => $region,
-                    'departement' => $departement,
-                ];
-        
-                // Insérer la demande en utilisant le modèle
-                $result = $this->demandeModel->enregistrerSFD($data);
-        
-                // Afficher un message en fonction du résultat de l'insertion
-                if ($result) {
-                    echo "La demande a été insérée avec succès!";
-                    header("Location: http://localhost:81/demande-appui/app/views/sfdRegister.php");
-                    exit();
-                } else {
-                    echo "Une erreur s'est produite lors de l'insertion de la demande.";
-                }
-            }
-        }
-        
-
-=======
-        
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
         public function getDepartementsByRegion($selectedRegion) {
             $database = new Database();
             $connexion = $database->getConnection();

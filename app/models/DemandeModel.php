@@ -69,7 +69,7 @@ class DemandeModel {
             exit(); // Assurez-vous de terminer le script après la redirection
         }
     }
-<<<<<<< HEAD
+
 
 
     public function enregistrerSFD($data) {
@@ -119,7 +119,5 @@ class DemandeModel {
             exit(); // Assurez-vous de terminer le script après la redirection
         }
     }
-=======
->>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
 }
 ?>
