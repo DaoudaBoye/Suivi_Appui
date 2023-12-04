@@ -72,6 +72,7 @@
                 }
             }
         }
+<<<<<<< HEAD
 
 
         public function registerForm() {
@@ -112,6 +113,9 @@
         }
         
 
+=======
+        
+>>>>>>> f3744f74b4e93630425e41b99ab97de9c67bdc03
         public function getDepartementsByRegion($selectedRegion) {
             $database = new Database();
             $connexion = $database->getConnection();
