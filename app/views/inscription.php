@@ -1,31 +1,68 @@
 <?php
-// Inclusion du fichier de connexion à la base de données
-require_once('C:/xampp/htdocs/demande/app/models/Database.php');
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (
+        isset($_POST["nickname"], $_POST["email"], $_POST["password"])
+        && !empty($_POST["nickname"]) && !empty($_POST["email"]) &&
+        !empty($_POST["password"]) && !empty($_POST["role"])
+    ) {
+        $pseudo = strip_tags($_POST["nickname"]);
+        $role = $_POST["role"];
+        
+        if (!filter_var($_POST["email"], FILTER_VALIDATE_EMAIL)) {
+            die("L'adresse email est incorrecte");
+        }
+        
+        // On va hacher le mot de passe
+        $password = password_hash($_POST["password"], PASSWORD_ARGON2ID);
 
-// Création d'une instance de la classe Database pour obtenir la connexion à la base de données
-$database = new Database();
-$connexion = $database->getConnection();
+        require_once('C:/xampp/htdocs/demande/app/models/Database.php');
 
-// Vérification de la connexion
-if ($connexion->connect_error) {
-    die("Échec de la connexion : " . $connexion->connect_error);
+        // Connexion à la base de données MySQLi
+        $db = new mysqli("localhost", "root", "", "demande_appui");
+
+        // Vérification de la connexion
+        if ($db->connect_error) {
+            die("Échec de la connexion : " . $db->connect_error);
+        }
+
+        // Préparation de la requête
+        $sql = "INSERT INTO utilisateurs (nom, email, password, role) VALUES (?, ?, ?, ?)";
+        $query = $db->prepare($sql);
+        
+        // Liaison des valeurs et exécution de la requête
+        $query->bind_param("ssss", $pseudo, $_POST["email"], $password, $role);
+        $query->execute();
+        
+        $id = $db->insert_id;
+
+        session_start();
+
+        $_SESSION["user"] = [
+          "id" => $id,
+          "pseudo" => $pseudo,
+          "email" => ["ROLE_USER"],
+          "roles" => json_decode($user["role"], true) // Assurez-vous que $user["role"] contient les rôles sous forme de chaîne JSON
+      ];
+
+     
+            header("Location: http://localhost:81/demande/app/views/formulaire.php");
+       
+            // Vérification de l'insertion
+        // if ($query->affected_rows > 0) {
+        //     echo "Utilisateur ajouté avec succès.";
+        // } else {
+        //     echo "Erreur lors de l'ajout de l'utilisateur : " . $db->error;
+        // }
+
+        // Fermeture de la connexion
+    //     $query->close();
+    //     $db->close();
+    } else {
+        die("Le formulaire est incomplet");
+    }
 }
-
-// Vérification si le formulaire a été soumis
-if (isset($_POST['register'])) {
-  // Création d'une instance de la classe DemandeModel
-  require_once('C:/xampp/htdocs/demande/app/models/DemandeModel.php'); // Remplacez Chemin_vers_votre_classe_DemandeModel par le chemin correct de votre classe DemandeModel
-  $demandeModel = new DemandeModel();
-
-  // Appel de la méthode insertDemande avec les données du formulaire
-  $result = $demandeModel->enregistrerSFD($_POST);
-
-  // Affichage du résultat ou message de réussite ou d'erreur
-  echo $result;
- 
-}
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr" >
@@ -34,9 +71,6 @@ if (isset($_POST['register'])) {
   <title>CodePen - nice-forms.css</title>
   <!-- Vos liens de feuilles de style -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-  <!-- <link rel="stylesheet" href="./style.css">
-  <link rel="stylesheet" href="./table.css"> -->
-  <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
     <!-- Custom Stylesheet -->
   <link href="./plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -173,7 +207,7 @@ body.dark-theme .navbar {
               Voir la liste des SFD</a>
           </li>
           <li>
-          <a href="http://localhost:81/demande/app/views/index.php">
+            <a href="#reset">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-power">
                 <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
                 <line x1="12" y1="2" x2="12" y2="12" />
@@ -195,66 +229,38 @@ body.dark-theme .navbar {
               <line x1="21" y1="14" x2="3" y2="14" />
               <line x1="21" y1="18" x2="3" y2="18" />
             </svg>
-            Enregistrer un SFD
+            Créer un utilisateur
           </h1>
           <p>Veuillez renseignez tous les champs svp !</p>
-          
+          <div class="nice-form-group">
+          <label for="role">Rôle</label>
+          <select id="role" name="role" required>
+            <option value="user">Utilisateur</option>
+            <option value="admin">Administrateur</option>
+            <option value="superadmin">Super Administrateur</option>
+          </select>
+</div>
 
-          <div id="sfdField" class="nice-form-group">
-            <label for="autreInput">Agrement</label>
-            <input type="text" id="sfdInput" name="agrementSFD" required>
+
+          <div class="nice-form-group">
+            <label for="pseudo">Pseudo</label>
+            <input type="text" id="speudo" name="nickname" required>
           </div>
 
           <div class="nice-form-group">
-            <label>Nom SFD</label>
-            <input type="text" placeholder="Name SFD" name="nameSFD" required/>
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="exemple@gmail.com" name="email" required/>
           </div>
 
           <div class="nice-form-group">
-            <label>Sigle SFD</label>
-            <input type="text" placeholder="Sigle SFD" name="sigleSFD" required />
-          </div>
-
-          <div class="nice-form-group">
-            <label>Phonenumber</label>
-            <input type="tel" placeholder="Contact SFD" value="" class="icon-right" name="contactSFD" id="contactSFD" required/>
-            </div>
-        
-          <div class="nice-form-group">
-            <label for="region">Région</label>
-            <select id="region" name="region" required>
-              <option value="">Please select a value</option>
-              <?php
-            
-                  // Vérification de la connexion
-                  if ($connexion->connect_error) {
-                      die("Échec de la connexion : " . $connexion->connect_error);
-                  }
-
-                  // Récupération des régions depuis la base de données
-                  $requeteRegions = "SELECT nom_region FROM region"; // Remplacez 'table_regions' par le nom réel de votre table
-                  $resultatRegions = $connexion->query($requeteRegions);
-
-                  // Génération des options de la liste déroulante
-                  if ($resultatRegions->num_rows > 0) {
-                      while ($row = $resultatRegions->fetch_assoc()) {
-                          echo "<option value='" . $row['nom_region'] . "'>" . $row['nom_region'] . "</option>";
-                      }
-                  }
-              ?>
-            </select>
+            <label for="password">Mot de passe</label>
+            <input type="password" name="password" required />
           </div>
         
-          <div class="nice-form-group">
-              <label for="departement">Département</label>
-              <select id="departement" name="departement" required>
-                  <option value="">Veuillez sélectionner une région d'abord</option>
-              </select>
-          </div>
-
+        
          
           <button type="submit" name="register">
-              <i class="fas fa-save"></i> Enregistrer
+              <i class="fas fa-save"></i> M'inscrire
           </button>
         </form>
       </section>
@@ -262,53 +268,5 @@ body.dark-theme .navbar {
       <footer>Made By ♥ FIMF</footer>
     </main>
   </div>
-  <!-- partial -->
-
-  <script>
-// jQuery example for handling region change and updating departments
-$(document).ready(function() {
-    $('#regionSelect').on('change', function() { // Change the ID to your region select ID
-        var selectedRegion = $(this).val();
-        $.ajax({
-            type: 'POST',
-            url: 'your_controller_endpoint_for_departments', // Replace with your actual endpoint
-            data: { region: selectedRegion },
-            success: function(response) {
-                // Update the departments select with the retrieved data
-                $('#departmentsSelect').html(response); // Change the ID to your departments select ID
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-            }
-        });
-    });
-});
-
-</script>
-
-
-<script>
-    function validateForm() {
-        var contactSFD = document.forms["yourForm"]["contactSFD"].value;
-        if (contactSFD === "") {
-            alert("Le champ Contact SFD doit être renseigné");
-            return false;
-        }
-        return true;
-    }
-  </script>
-
-<script>
-  const themeToggle = document.getElementById('themeToggle');
-
-  themeToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-theme');
-      if (document.body.classList.contains('dark-theme')) {
-          themeToggle.textContent = 'Mode clair';
-      } else {
-          themeToggle.textContent = 'Mode sombre';
-      }
-  });
-</script>
 </body>
 </html>

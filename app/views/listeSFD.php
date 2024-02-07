@@ -1,6 +1,6 @@
 <?php
 // Inclusion du fichier de connexion à la base de données
-require_once('C:/xampp/htdocs/demande-appui/app/models/Database.php');
+require_once('C:/xampp/htdocs/demande/app/models/Database.php');
 
 // Création d'une instance de la classe Database pour obtenir la connexion à la base de données
 $database = new Database();
@@ -15,7 +15,7 @@ if ($connexion->connect_error) {
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" >
 <head>
   <meta charset="UTF-8">
   <title>CodePen - nice-forms.css</title>
@@ -32,18 +32,81 @@ if ($connexion->connect_error) {
   <link rel="stylesheet" href="../public/style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="../public/script.js"></script>
-  <!-- Ajoute le script de SheetJS (XLSX) depuis un CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.15/xlsx.full.min.js"></script>
-  <!-- Ajoute la bibliothèque Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+        padding-top: 60px; /* Ajustez la valeur selon la hauteur de votre barre de navigation */
+    }
+
+    
+    /* Styles pour le mode sombre */
+body.dark-theme {
+    background-color: #222;
+    color: #fff; /* Couleur de texte en mode sombre */
+} */
+    /* Styles spécifiques pour le bouton en mode sombre */
+body.dark-theme #themeToggle {
+    background-color: #ffcc00; /* Couleur de fond pour le bouton en mode sombre */
+    color: #222; /* Couleur de texte pour le bouton en mode sombre */
+    border: 1px solid #ffcc00; /* Bordure pour le bouton en mode sombre */
+    /* Autres styles selon votre préférence */
+}
+
+/* Hover styles pour le bouton en mode sombre */
+body.dark-theme #themeToggle:hover {
+    background-color: #ffdd44; /* Couleur de fond au survol en mode sombre */
+    color: #333; /* Couleur de texte au survol en mode sombre */
+    border-color: #fff; /* Couleur de bordure au survol en mode sombre */
+    /* Autres styles au survol selon votre préférence */
+}
+
+body.dark-theme .navbar {
+    background-color: #fff; /* Couleur de fond pour le bouton en mode sombre */
+    color: #222; /* Couleur de texte pour le bouton en mode sombre */
+    border: 1px solid #fff; /* Bordure pour le bouton en mode sombre */
+    /* Autres styles selon votre préférence */
+}
+
+    
+</style>
+
 </head>
 <body>
+    <!-- Barre de navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <a class="navbar-brand" href="#">
+    <img src="Logo_FIMF.png" alt="Logo" height="40">
+  </a>
+  <!-- Bouton pour afficher le menu sur mobile -->
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="button-group">
+    <button id="themeToggle">Mode sombre</button>
+  </div>
+  <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="http://localhost:81/demande/app/views/formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> À propos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-envelope"></i> Contact</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-user"></i> Mon compte</a>
+        </li>
+      </ul>
+    </div>
+</nav>
   <div class="demo-page">
   <div class="demo-page-navigation mon-demo">
       <nav>
         <ul>
           <li>
-            <a href="http://localhost:81/demande-appui/app/views/formulaire.php">
+            <a href="http://localhost:81/demande/app/views/formulaire.php">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
             </svg>
@@ -58,7 +121,7 @@ if ($connexion->connect_error) {
               </svg>
               Voir la liste des demandes</a>
           </li>
-          <li>
+          <!-- <li>
             <a href="#input-types">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-justify">
                 <line x1="21" y1="10" x2="3" y2="10" />
@@ -67,10 +130,10 @@ if ($connexion->connect_error) {
                 <line x1="21" y1="18" x2="3" y2="18" />
               </svg>
               Modifier une demande</a>
-          </li>
+          </li> -->
         
           <li>
-            <a href="#customization">
+            <a href="http://localhost:81/demande/app/views/sfdRegister.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders">
                 <line x1="4" y1="21" x2="4" y2="14" />
                 <line x1="4" y1="10" x2="4" y2="3" />
@@ -85,7 +148,7 @@ if ($connexion->connect_error) {
               Enregistrer un SFD</a>
           </li>
           <li>
-            <a href="#contribute">
+            <a href="http://localhost:81/demande/app/views/listeSFD.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
                 <line x1="8" y1="6" x2="21" y2="6" />
                 <line x1="8" y1="12" x2="21" y2="12" />
@@ -97,7 +160,7 @@ if ($connexion->connect_error) {
               Voir la liste des SFD</a>
           </li>
           <li>
-            <a href="#reset">
+          <a href="http://localhost:81/demande/app/views/index.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-power">
                 <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
                 <line x1="12" y1="2" x2="12" y2="12" />
@@ -107,9 +170,9 @@ if ($connexion->connect_error) {
         </ul>
       </nav>
     </div>
-    <main class="demo-page-content col-12">
+    <main class="demo-page-content col-12 centered-form">
       <section>
-      <h1 class="card-title" style="text-align: center;">Liste des demandes</h1>
+      <h1 class="card-title" style="text-align: center;">Liste des SFD</h1>
       <div class="row mb-3">
       <div class="col-md-9 mx-auto">
         <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une demande">
@@ -408,6 +471,19 @@ const rowsPerPage = 10; // Nombre de demandes par page
     const filename = 'liste_SFD_' + currentDate.toISOString().slice(0, 10) + '.csv'; // Nom du fichier CSV
 
     downloadCSV(csvContent, filename); // Télécharge le contenu en tant que fichier CSV
+  });
+</script>
+
+<script>
+  const themeToggle = document.getElementById('themeToggle');
+
+  themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      if (document.body.classList.contains('dark-theme')) {
+          themeToggle.textContent = 'Mode clair';
+      } else {
+          themeToggle.textContent = 'Mode sombre';
+      }
   });
 </script>
 </body>

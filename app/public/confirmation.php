@@ -30,7 +30,7 @@
     </style>
     <script>
         setTimeout(function(){
-            window.location.href = "http://localhost:81/demande-appui/app/views/formulaire.php";
+            window.location.href = "http://localhost:81/demande/app/views/formulaire.php";
         }, 3000); // Redirection après 3 secondes ("3000 millisecondes)
     </script>
 </head>

@@ -28,7 +28,7 @@
         
                 // Vérifier la valeur sélectionnée et attribuer le nom correspondant
                 if ($beneficiaire === 'SFD') {
-                    $nomBeneficiaire = $_POST['autreInput'];
+                    $nomBeneficiaire = $_POST['sfdName'];
                 } elseif ($beneficiaire === 'Autre') {
                     $nomBeneficiaire = $_POST['nomBeneficiaire'];
                 }
@@ -65,7 +65,7 @@
                 // Afficher un message en fonction du résultat de l'insertion
                 if ($result) {
                     echo "La demande a été insérée avec succès!";
-                    header("Location: http://localhost:81/demande-appui/app/views/formulaire.php");
+                    header("Location: http://localhost:81/demande/app/views/formulaire.php");
                     exit();
                 } else {
                     echo "Une erreur s'est produite lors de l'insertion de la demande.";

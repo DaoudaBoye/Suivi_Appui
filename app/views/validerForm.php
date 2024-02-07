@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Inclusion du fichier de connexion à la base de données
 require_once('C:/xampp/htdocs/demande/app/models/Database.php');
 
@@ -31,16 +32,14 @@ if ($connexion->connect_error) {
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="../public/script.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
   <style>
     body {
         padding-top: 60px; /* Ajustez la valeur selon la hauteur de votre barre de navigation */
     }
 
-      /* Styles pour le mode sombre */
-
+    
     /* Styles pour le mode sombre */
-    body.dark-theme {
+body.dark-theme {
     background-color: #222;
     color: #fff; /* Couleur de texte en mode sombre */
 } */
@@ -67,54 +66,68 @@ body.dark-theme .navbar {
     /* Autres styles selon votre préférence */
 }
 
-    
+  /* Exemple de style pour l'icône de profil et le nom de l'utilisateur */
+  .profile {
+    display: flex;
+    align-items: center;
+    color: #fff;
+}
+
+.profile img {
+    width: 40px; /* Ajustez la taille de votre icône */
+    height: 40px;
+    border-radius: 50%; /* Pour un style de cercle */
+    margin-right: 10px; /* Espace entre l'icône et le texte */
+}
+
+.profile span {
+    font-weight: bold;
+    font-size: 16px;
+}   
 
 </style>
 
 </head>
 <body>
-     <!-- Barre de navigation -->
-     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="#">
-    <img src="Logo_FIMF.png" alt="Logo" height="40">
-  </a>
-  <!-- Bouton pour afficher le menu sur mobile -->
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="button-group">
-    <button id="themeToggle">Mode sombre</button>
-  </div>
-  <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="http://localhost:81/demande/app/views/formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> À propos</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="fas fa-envelope"></i> Contact</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#"><i class="fas fa-user"></i> Mon compte</a>
-        </li>
-      </ul>
-    </div>
-</nav>
+   <!-- Barre de navigation -->
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="#">
+        <img src="Logo_FIMF.png" alt="Logo" height="40">
+      </a>
+      <!-- Bouton pour afficher le menu sur mobile -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="button-group">
+        <button id="themeToggle">Mode sombre</button>
+      </div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="http://localhost:81/demande/app/views/formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> À propos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"><i class="fas fa-envelope"></i> Contact</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"><i class="fas fa-user"></i> Mon compte</a>
+            </li>
+            <div class="profile">
+            <span>Bienvenue, <?php echo $_SESSION['name']; ?>!</span>
+            <img src="user.png" alt="Icône de profil">
+        </div>
+          </ul>
+        </div>
+    </nav>
   <div class="demo-page">
   <div class="demo-page-navigation mon-demo">
       <nav>
         <ul>
           <li>
-            <a href="http://localhost:81/demande/app/views/formulaire.php">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-            </svg>
-              Insérer une demande</a>
-          </li>
-          <li>
-            <a href="liste_demande.php">
+            <a href="http://localhost:81/demande/app/views/adminConfirm.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
                 <polygon points="12 2 2 7 12 12 22 7 12 2" />
                 <polyline points="2 17 12 22 22 17" />
@@ -122,17 +135,7 @@ body.dark-theme .navbar {
               </svg>
               Voir la liste des demandes</a>
           </li>
-          <!-- <li>
-            <a href="#input-types">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-justify">
-                <line x1="21" y1="10" x2="3" y2="10" />
-                <line x1="21" y1="6" x2="3" y2="6" />
-                <line x1="21" y1="14" x2="3" y2="14" />
-                <line x1="21" y1="18" x2="3" y2="18" />
-              </svg>
-              Modifier une demande</a>
-          </li> -->
-        
+     
           <li>
             <a href="http://localhost:81/demande/app/views/sfdRegister.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders">
@@ -161,7 +164,19 @@ body.dark-theme .navbar {
               Voir la liste des SFD</a>
           </li>
           <li>
-          <a href="http://localhost:81/demande/app/views/index.php">
+            <a href="http://localhost:81/demande/app/views/validerForm.php">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="3" y1="6" x2="3.01" y2="6" />
+                <line x1="3" y1="12" x2="3.01" y2="12" />
+                <line x1="3" y1="18" x2="3.01" y2="18" />
+              </svg>
+              Demandes validées</a>
+          </li>
+          <li>
+          <a href="http://localhost:81/demande/app/views/deconnexion.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-power">
                 <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
                 <line x1="12" y1="2" x2="12" y2="12" />
@@ -191,6 +206,7 @@ body.dark-theme .navbar {
                     <table class="table table-striped table-bordered">
                       <thead class="thead-dark">
                         <tr>
+                        <th scope="col">Valide</th>
                           <th scope="col">id_demande</th>
                           <th scope="col">Beneficiaire</th>
                           <th scope="col">nomBeneficiaire</th>
@@ -203,18 +219,20 @@ body.dark-theme .navbar {
                           <th scope="col">Quantite_equipement_octroyes</th>
                           <th scope="col">Cout_appuis</th>
                           <th scope="col">Observation</th>
+
                         </tr>
                       </thead>
                       <tbody>
                         <?php
                           // require_once("../models/Database.php") ;
                       
-                          $sql = "SELECT * FROM liste_demande_appui";
+                          $sql = "SELECT * FROM liste_demande_appui WHERE traite = 1;";
                           $result = $connexion->query($sql);
 
                           if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 echo "<tr>";
+                                echo "<td><i class='fas fa-check' style='color: green;'></i></td>";
                                 echo "<th scope='row'>" . $row["id_demande"] . "</th>";
                                 echo "<td>" . $row["Beneficiaire"] . "</td>";
                                 echo "<td>" . $row["nomBeneficiaire"] . "</td>";
@@ -232,7 +250,6 @@ body.dark-theme .navbar {
                                       <a href='supprimer_demande.php?id=" . $row["id_demande"] . "'><i class='fas fa-trash' style='color: red;'></i></a>
                                     </td>";
                                 echo "</tr>";
-                               
                             }
                         } else {
                             echo "<tr><td colspan='13'>Aucun résultat</td></tr>";
@@ -266,9 +283,11 @@ body.dark-theme .navbar {
           </div>
         </div>
       </section>
-      <footer>Made By ♥ FIMF</footer>
+
+<!-- Votre contenu HTML existant -->
     </main>
   </div>
+  
 
   <script src="plugins/common/common.min.js"></script>
     <script src="js/custom.min.js"></script>
@@ -493,6 +512,12 @@ const rowsPerPage = 10; // Nombre de demandes par page
       }
   });
 </script>
+
+ <!-- Inclure les liens JavaScript de Bootstrap (jQuery inclus) -->
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Votre contenu HTML existant -->
 </body>
+
 </html>
 

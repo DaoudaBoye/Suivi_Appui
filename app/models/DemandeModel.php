@@ -119,5 +119,30 @@ class DemandeModel {
             exit(); // Assurez-vous de terminer le script après la redirection
         }
     }
+
+    public function validerDemande($id_demande) {
+        $sql = "UPDATE liste_demande_appui SET traite = 1 WHERE id_demande = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("i", $id_demande);
+
+        if ($stmt->execute()) {
+            return array("message" => "La demande a été validée avec succès !");
+        } else {
+            return array("message" => "Erreur lors de la validation de la demande : " . $this->db->error);
+        }
+    }
+
+    // public function refuserDemande($id_demande) {
+    //     $sqlreuse = "UPDATE liste_demande_appui SET annuler = 1 WHERE id_demande = ?";
+    //     $stmt = $this->db->prepare($sqlreuse);
+    //     $stmt->bind_param("i", $id_demande);
+
+    //     if ($stmt->execute()) {
+    //         return array("message" => "La demande a été validée avec succès !");
+    //     } else {
+    //         return array("message" => "Erreur lors de la validation de la demande : " . $this->db->error);
+    //     }
+    // }
+    
 }
 ?>

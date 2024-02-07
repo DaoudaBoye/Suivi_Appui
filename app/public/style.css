@@ -587,21 +587,76 @@ body {
 }
 
 .demo-page {
-  margin: 0 auto;
+  /* margin: 0 auto; */
   display: flex;
-  max-width: 55em;
+  /* max-width: 55em; */
 }
+
 
 .demo-page .demo-page-navigation {
   width: 18em;
   padding: 2em 1em;
 }
 
+
+
+/* @media only screen and (max-width: 750px) {
+  .demo-page .demo-page-navigation {
+    display: none;
+  }
+} */
+
+
+/* Cache le menu de navigation par défaut sur les appareils mobiles */
 @media only screen and (max-width: 750px) {
   .demo-page .demo-page-navigation {
     display: none;
   }
+
+  .mon-demo .demo-page-navigation {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    z-index: 9999;
+    padding: 2em;
+    box-sizing: border-box;
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100%);
+  }
+
+  .mon-demo .demo-page-navigation.open {
+    transform: translateX(0);
+  }
+
+  .mon-demo .demo-page-navigation nav ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .mon-demo .demo-page-navigation nav ul li {
+    margin-bottom: 1em;
+  }
+
+  .mon-demo .demo-page-navigation nav ul li a {
+    text-decoration: none;
+    color: #374151;
+    display: block;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .mon-demo .demo-page-navigation nav ul li a:hover {
+    background-color: #f3f4f6;
+  }
 }
+
 .demo-page .demo-page-navigation nav {
   position: sticky;
   top: 2em;
@@ -633,7 +688,15 @@ body {
 
 .demo-page .demo-page-content {
   padding: 2em 1em;
-  max-width: 100%;
+  max-width: 50%;
+  justify-content: center; /* Centre horizontalement le contenu de .demo-page */
+  align-items: center; /* Centre verticalement le contenu de .demo-page */
+  margin-left: 100px; /* Vous pouvez ajuster cette valeur en fonction de l'écart que vous souhaitez entre l'élément et la gauche */
+}
+
+.demo-page .centered-form{
+  max-width: 70% !important;
+  margin-left: 5px !important;
 }
 
 @media only screen and (min-width: 750px) {
@@ -641,6 +704,8 @@ body {
     width: calc(100% - 18em);
   }
 }
+
+
 footer {
   text-align: center;
   margin: 2.5em 0;
