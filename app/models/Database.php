@@ -3,7 +3,7 @@ class Database {
     private $servername = "localhost";
     private $username = "root";
     private $password = "";
-    private $dbname = "demande_appui";
+    private $dbname = "suiviappui";
     private $connection;
 
     public function __construct() {
@@ -24,4 +24,3 @@ class Database {
         }
     }
 }
-?>

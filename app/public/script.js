@@ -49,40 +49,6 @@ $(document).ready(function() {
     });
 });
 
-// // Gère la recherche côté frontend
-
-// document.getElementById("searchInput").addEventListener("input", function(event) {
-//     const searchValue = event.target.value.toLowerCase();
-
-//     fetch(`/search?sfd=${searchValue}`) // Appel de l'API côté backend avec le terme de recherche
-//         .then(response => response.json())
-//         .then(data => {
-//             displayResults(data); // Affichage des résultats récupérés depuis le backend
-//         })
-//         .catch(error => {
-//             console.error('Error:', error);
-//         });
-// });
-
-// // Affiche les résultats de la recherche côté frontend
-
-
-// function displayResults(results) {
-//     const resultsContainer = document.getElementById("results");
-//     resultsContainer.innerHTML = ""; // Efface les résultats précédents
-
-//     if (results.length > 0) {
-//         results.forEach(result => {
-//             const resultElement = document.createElement("p");
-//             resultElement.textContent = `Sigle: ${result.sigles}, Région: ${result.regions}, Département: ${result.departement}`;
-//             resultsContainer.appendChild(resultElement);
-//         });
-//     } else {
-//         const noResultsElement = document.createElement("p");
-//         noResultsElement.textContent = "Aucun résultat trouvé.";
-//         resultsContainer.appendChild(noResultsElement);
-//     }
-// }
 
 
 // Affiche/masque les champs en fonction de la valeur sélectionnée pour le bénéficiaire
@@ -122,3 +88,5 @@ $(document).ready(function() {
 
  
      
+
+  

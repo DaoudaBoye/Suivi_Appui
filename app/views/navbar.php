@@ -35,7 +35,7 @@ if ($connexion->connect_error) {
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <style>
 
-body {
+.body1 {
         padding-top: 80px; /* Ajustez la valeur selon la hauteur de votre barre de navigation */
     }
 /* 
@@ -81,7 +81,7 @@ body.dark-theme .navbar {
 </style>
 
 </head>
-<body>
+<body class="body1">
 <div class="demo-page my-demo">
     
     <div class="demo-page-navigation">

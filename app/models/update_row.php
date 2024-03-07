@@ -1,47 +1,57 @@
 <?php
-// Récupérez les données envoyées par la requête AJAX
-$data = $_POST;
+require_once('Database.php');
 
-// Vérifiez si les données nécessaires sont présentes
-if (isset($data['id_demande']) && isset($data['nomBeneficiaire'])) {
-    require_once('Database.php');
+// Assurez-vous que les données POST ont été reçues correctement
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupérer les données éditées du formulaire
+    $id_demande = $_POST['id_demande'];
+    $nature = $_POST['Nature'];
+    $theme = $_POST['Theme'];
+    $date_demande = $_POST['Date_demande'];
+    $quantite = $_POST['Quantite'];
+    $cout_appui = $_POST['Cout_appui'];
+    $nombre_homme_elu = $_POST['Nombre_homme_elu'];
+    $nombre_femme_elu = $_POST['Nombre_femme_elu'];
+    $nombre_homme_personnel = $_POST['Nombre_homme_personnel'];
+    $nombre_femme_personnel = $_POST['Nombre_femme_personnel'];
+    $observation = $_POST['Observation'];
 
-    // Créez une instance de la classe Database pour obtenir la connexion à la base de données
-    $database = new Database();
-    $conn = $database->getConnection();
 
-    // Vérifiez la connexion
-    if ($conn->connect_error) {
-        $response = array('success' => false, 'message' => 'Erreur de connexion à la base de données');
-        echo json_encode($response);
-        exit();
-    }
+    // Préparez votre requête SQL pour mettre à jour la demande
+    $sql = "UPDATE demande_appui SET 
+                        Nature = ?,
+                        Theme = ?,
+                        Date_demande = ?,
+                        /* Region = ?, */
+                        /* Departement = ?, */
+                        Quantite = ?,
+                        Cout_appui = ?,
+                        Nombre_homme_elu = ?,
+                        Nombre_femme_elu = ?,
+                        Nombre_homme_personnel = ?,
+                        Nombre_femme_personnel = ?,
+                        Observation = ?
+                    WHERE id_demande = ?";
+;
 
-    // Utilisez des requêtes préparées pour éviter les injections SQL
-    $id_demande = $conn->real_escape_string($data['id_demande']);
-    $newValue = $conn->real_escape_string($data['nomBeneficiaire']);
-    $sql = "UPDATE liste_demande_appui SET nomBeneficiaire = ? WHERE id_demande = ?";
+    // Préparez et exécutez la déclaration
+    $stmt = $connexion->prepare($sql);
+    $stmt->bind_param("sssssiddiii", 
+        $nature, $theme, $date_demande, 
+        $quantite, $cout_appui, $nombre_homme_elu, $nombre_femme_elu, 
+        $nombre_homme_personnel, $nombre_femme_personnel, $observation, $id_demande
+    );
 
-    $stmt = $conn->prepare($sql);
-    if ($stmt) {
-        $stmt->bind_param("si", $newValue, $id_demande);
-        if ($stmt->execute()) {
-            $response = array('success' => true, 'message' => 'Mise à jour réussie');
-            echo json_encode($response);
-        } else {
-            $response = array('success' => false, 'message' => 'Échec de la mise à jour : ' . $stmt->error);
-            echo json_encode($response);
-        }
-        $stmt->close();
+    // Assurez-vous que les valeurs sont correctement liées et exécutez la requête
+    if ($stmt->execute()) {
+        // La demande a été mise à jour avec succès
+        echo "success";
     } else {
-        $response = array('success' => false, 'message' => 'Échec de préparation de la requête : ' . $conn->error);
-        echo json_encode($response);
+        // Il y a eu une erreur lors de la mise à jour de la demande
+        echo "error: " . $stmt->error;
     }
 
-    // Fermez la connexion à la base de données
-    $conn->close();
-} else {
-    $response = array('success' => false, 'message' => 'Données manquantes pour la mise à jour');
-    echo json_encode($response);
+    // Fermez la déclaration et la connexion à la base de données
+    $stmt->close();
+    $connexion->close();
 }
-?>

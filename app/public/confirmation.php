@@ -30,23 +30,25 @@
     </style>
     <script>
         setTimeout(function(){
-            window.location.href = "http://localhost:81/demande/app/views/formulaire.php";
+            window.location.href = "http://localhost:81/demande/app/views/user/formulaire.php";
         }, 3000); // Redirection après 3 secondes ("3000 millisecondes)
     </script>
 </head>
 <body>
-    <div class="message-container">
-        <?php
-        session_start();
+<script>
+    <?php
+    session_start();
 
-        if (isset($_SESSION['success_message'])) {
-            echo "<p class='success'>" . $_SESSION['success_message'] . "</p>";
-            unset($_SESSION['success_message']); // Effacer le message après l'avoir affiché
-        } elseif (isset($_SESSION['error_message'])) {
-            echo "<p class='error'>" . $_SESSION['error_message'] . "</p>";
-            unset($_SESSION['error_message']); // Effacer le message après l'avoir affiché
-        }
-        ?>
-    </div>
+    if (isset($_SESSION['success_message'])) {
+        echo "alert('" . $_SESSION['success_message'] . "');";
+        unset($_SESSION['success_message']); // Effacer le message après l'avoir affiché
+    } elseif (isset($_SESSION['error_message'])) {
+        echo "alert('" . $_SESSION['error_message'] . "');";
+        unset($_SESSION['error_message']); // Effacer le message après l'avoir affiché
+    }
+    ?>
+    window.location.href = "http://localhost:81/demande/app/views/user/formulaire.php"; // Redirection après affichage de la popup
+</script>
+
 </body>
 </html>

@@ -28,7 +28,7 @@
       style="min-height: 100vh">
 	 
       	<form class="border shadow p-3 rounded"
-      	      action="http://localhost:81/demande/app/views/check-login.php" 
+      	      action="http://localhost:81/suiviAppui/app/auth/check-login.php" 
       	      method="post" 
       	      style="width: 450px;">
       	      <h1 class="text-center p-3">LOGIN</h1>
@@ -62,6 +62,11 @@
 		  </div> 
 		  <button type="submit" 
 		          class="btn btn-primary">LOGIN</button>
+				  <?php
+if (!empty($error)) {
+    echo '<div class="alert alert-danger">' . $error . '</div>';
+}
+?>
 		</form>
       </div> 
 	  

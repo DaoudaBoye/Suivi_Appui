@@ -6,143 +6,100 @@ class DemandeModel {
 
     public function __construct() {
         try {
-            // Crée une instance de la classe Database pour obtenir la connexion à la base de données
+            // Établit une connexion à la base de données en utilisant la classe Database
             $database = new Database();
             $this->db = $database->getConnection();
         } catch (Exception $e) {
-            // Gérer l'erreur de connexion à la base de données
+            // En cas d'erreur lors de la connexion à la base de données, affiche un message d'erreur et arrête l'exécution du script
             die("Erreur de connexion à la base de données : " . $e->getMessage());
         }
     }
 
     public function insertDemande($data) {
         try {
-            // Préparation de la requête SQL pour l'insertion d'une demande
-            $query = "INSERT INTO liste_demande_appui (Beneficiaire, nomBeneficiaire, Region_beneficiaire, Departement_beneficiaire, Type_appui, Type_activite, Intitule, date_demande, Cout_appuis, Quantite_equipement_octroyes, Observation) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            // Récupération des données du formulaire
+            $beneficiaire = $data['beneficiaire'];
+            $nomBeneficiaire = ($beneficiaire === 'SFD') ? $data['sfdName'] : $data['autreBeneficiaire'];
+            $typeActivite = $data['typeActivite'];
+            $nature = $data['Nature'];
+            $Theme = $data['Theme'];
+            $NbreEluH = $data['NbreEluH'];
+            $NbreEluF = $data['NbreEluF'];
+            $NbrePersH= $data['NbrePersH'];
+            $NbrePersF = $data['NbrePersF'];
+            $date_demande = $data['date_demande'];
+            $Cout_appui = $data['Cout_appui'];
+            $Qt_equi_oct = $data['Qt_equi_oct'];
+            $observation = $data['observation'];
+    
+            $agrement = null;
+            $id_structure = null;
+            $id_activite = null;
+    
+            // Récupère l'ID de l'activité à partir de la table type_activite
+            $queryActivite = "SELECT id_activite FROM type_activite WHERE Nom_activite = ?";
+            $stmtActivite = $this->db->prepare($queryActivite);
+            $stmtActivite->bind_param("s", $typeActivite);
+            if ($stmtActivite->execute()) {
+                $stmtActivite->bind_result($id_activite);
+                if (!$stmtActivite->fetch()) {
+                    throw new Exception("Aucune information trouvée pour le type d'activité : " . $typeActivite);
+                }
+            } else {
+                throw new Exception("Erreur lors de la récupération de l'ID de l'activité : " . $stmtActivite->error);
+            }
+            $stmtActivite->close();
 
-            // Préparation de la requête
+    
+            $queryAgrement = "SELECT Agrement FROM liste_sfd WHERE SigleSFD = ?";
+            $stmtAgrement = $this->db->prepare($queryAgrement);
+            $stmtAgrement->bind_param("s", $nomBeneficiaire); // Utilisez $nomBeneficiaire au lieu de $typeAgrement
+                    // Exécution de la requête pour récupérer l'agrément
+            if ($stmtAgrement->execute()) {
+                // Liaison du résultat de la requête à une variable
+                $stmtAgrement->bind_result($agrement);
+                // Récupération du résultat de la requête
+                if (!$stmtAgrement->fetch()) {
+                    throw new Exception("Aucune information trouvée pour le SigleSFD : " . $nomBeneficiaire);
+                }
+            } else {
+                throw new Exception("Erreur lors de l'exécution de la requête pour récupérer l'Agrement : " . $stmtAgrement->error);
+            }
+            $stmtAgrement->close();
+
+            
+
+
+
+            // Prépare la requête d'insertion dans la table demande_appui
+            $query = "INSERT INTO demande_appui (Type_Beneficiaire, Nom_Beneficiaire, Agrement, id_structure, id_activite, Nature, Theme, Nombre_homme_elu, Nombre_femme_elu, Nombre_homme_personnel, Nombre_femme_personnel, Date_demande, Quantite, Cout_appui, Observation) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
             $stmt = $this->db->prepare($query);
-
-            // Vérification si la préparation a réussi
+    
             if (!$stmt) {
                 throw new Exception("Erreur de préparation de la requête : " . $this->db->error);
             }
-
-            $beneficiaire = $_POST['beneficiaire'];
-            $nomBeneficiaire = "";
     
-            // Vérifier la valeur sélectionnée et attribuer le nom correspondant
+            // Crée une variable nulle pour les valeurs par défaut
+            $nullValue = NULL;
+    
+            // Lie les variables aux paramètres de la requête SQL en fonction du type de bénéficiaire
             if ($beneficiaire === 'SFD') {
-                $nomBeneficiaire = $_POST['sfdName'];
-            } elseif ($beneficiaire === 'Autre') {
-                $nomBeneficiaire = $_POST['nomBeneficiaire'];
+                $stmt->bind_param("ssssissiiiisiis", $beneficiaire, $nomBeneficiaire, $agrement, $nullValue, $id_activite, $nature, $Theme, $NbreEluH, $NbreEluF, $NbrePersH, $NbrePersF, $date_demande, $Cout_appui, $Qt_equi_oct, $observation);
+            } else {
+                $stmt->bind_param("ssssissiiiisiis", $beneficiaire, $nomBeneficiaire, $nullValue, $id_structure, $id_activite, $nature, $Theme, $NbreEluH, $NbreEluF, $NbrePersH, $NbrePersF, $date_demande, $Cout_appui, $Qt_equi_oct, $observation);
             }
     
-            // Récupérer les autres données du formulaire
-            $region = $_POST['region'];
-            $departement = $_POST['departement'];
-            $typeAppui = $_POST['type_appui'];
-            $typeActivite = $_POST['typeActivite'];
-            $intitule = $_POST['intitule'];
-            $date = $_POST['date_demande'];
-            $cout_appui = $_POST['Cout_appui'];
-            $qt_equipements_oct = $_POST['Qt_equi_oct'];
-            $observation = $_POST['observation'];
-
-            // Assurer la sécurité des données en utilisant des variables de liaison pour la requête
-            $stmt->bind_param("sssssssssss", $beneficiaire, $nomBeneficiaire, $region, $departement, $typeAppui, $typeActivite, $intitule, $date, $cout_appui, $qt_equipements_oct, $observation);
-
+            // Exécute la requête et retourne un message de succès ou d'erreur
             if ($stmt->execute()) {
-                session_start();
-                $_SESSION['success_message'] = "La demande a été insérée avec succès!";
-                header("Location: ../public/confirmation.php"); // Redirige vers une page de confirmation
-                exit(); // Assurez-vous de terminer le script après la redirection
-                
+                return "success";
             } else {
                 throw new Exception("Erreur lors de l'enregistrement : " . $stmt->error);
             }
         } catch (Exception $e) {
-            session_start();
-            $_SESSION['error_message'] = $e->getMessage();
-            header("Location: ../public/confirmation.php"); // Redirige vers une page d'erreur
-            exit(); // Assurez-vous de terminer le script après la redirection
+            // Capture les exceptions et retourne un message d'erreur
+            return "Erreur lors de l'enregistrement : " . $e->getMessage();
         }
     }
-
-
-
-    public function enregistrerSFD($data) {
-        try {
-            // Vérifiez la connexion à la base de données avant d'utiliser prepare()
-            if (!$this->db) {
-                throw new Exception("Connexion à la base de données non établie.");
-            }
-    
-            // Préparation de la requête SQL pour l'insertion d'une demande
-            $query = "INSERT INTO liste_sfd (Agrement, Nom_SFD, SigleSFD, Contact, Region, Departement) 
-            VALUES (?, ?, ?, ?, (SELECT id_region FROM region WHERE nom_region = ?), (SELECT id_dept FROM departement WHERE nom_dept = ?))";
-  
-            // Préparation de la requête
-            $stmt = $this->db->prepare($query);
-    
-            // Vérification si la préparation a réussi
-            if (!$stmt) {
-                throw new Exception("Erreur de préparation de la requête : " . $this->db->error);
-            }
-    
-            // Récupérer les données du formulaire avec les clés correctes
-            $agrementSFD = $data['agrementSFD'];
-            $nomSFD = $data['nameSFD'];
-            $sigleSFD = $data['sigleSFD'];
-            $contactSFD = $_POST['contactSFD'];
-            // Assurez-vous que le champ 'contactSFD' existe dans le formulaire pour récupérer sa valeur
-            // $contactSFD = $data['contactSFD']; // Décommentez cette ligne si le champ est présent dans le formulaire
-            $region = $data['region'];
-            $departement = $data['departement'];
-    
-            // Assurer la sécurité des données en utilisant des variables de liaison pour la requête
-            $stmt->bind_param("ssssss", $agrementSFD, $nomSFD, $sigleSFD, $contactSFD, $region, $departement);
-    
-            if ($stmt->execute()) {
-                session_start();
-                $_SESSION['success_message'] = "Le SFD a été enregistré avec succès!";
-                header("Location: ../public/confirmation.php"); // Redirige vers une page de confirmation
-                exit(); // Assurez-vous de terminer le script après la redirection
-            } else {
-                throw new Exception("Erreur lors de l'enregistrement : " . $stmt->error);
-            }
-        } catch (Exception $e) {
-            session_start();
-            $_SESSION['error_message'] = $e->getMessage();
-            header("Location: ../public/confirmation.php"); // Redirige vers une page d'erreur
-            exit(); // Assurez-vous de terminer le script après la redirection
-        }
-    }
-
-    public function validerDemande($id_demande) {
-        $sql = "UPDATE liste_demande_appui SET traite = 1 WHERE id_demande = ?";
-        $stmt = $this->db->prepare($sql);
-        $stmt->bind_param("i", $id_demande);
-
-        if ($stmt->execute()) {
-            return array("message" => "La demande a été validée avec succès !");
-        } else {
-            return array("message" => "Erreur lors de la validation de la demande : " . $this->db->error);
-        }
-    }
-
-    // public function refuserDemande($id_demande) {
-    //     $sqlreuse = "UPDATE liste_demande_appui SET annuler = 1 WHERE id_demande = ?";
-    //     $stmt = $this->db->prepare($sqlreuse);
-    //     $stmt->bind_param("i", $id_demande);
-
-    //     if ($stmt->execute()) {
-    //         return array("message" => "La demande a été validée avec succès !");
-    //     } else {
-    //         return array("message" => "Erreur lors de la validation de la demande : " . $this->db->error);
-    //     }
-    // }
-    
 }
-?>

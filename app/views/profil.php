@@ -1,22 +1,41 @@
 <?php
+session_start();
+require_once('C:/xampp/htdocs/demande/app/models/Database.php');
 
-session_start(); // Assurez-vous que cette ligne est présente avant toute utilisation de $_SESSION
- include "navbar.php";
-// Inclusion du fichier de connexion à la base de données
-    require_once('C:/xampp/htdocs/demande/app/models/Database.php');
+$database = new Database();
+$connexion = $database->getConnection();
 
-    // Création d'une instance de la classe Database pour obtenir la connexion à la base de données
-    $database = new Database();
-    $connexion = $database->getConnection();
+if ($connexion->connect_error) {
+    die("Échec de la connexion : " . $connexion->connect_error);
+}
 
-    // Vérification de la connexion
-    if ($connexion->connect_error) {
-        die("Échec de la connexion : " . $connexion->connect_error);
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['username'])) {
+    $username = $_POST['username'];
+
+    // Requête SQL préparée pour éviter les attaques par injection SQL
+    $query = "SELECT * FROM users WHERE username = ?";
+    $stmt = $connexion->prepare($query);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Récupérer les données de l'utilisateur depuis la base de données
+        $user = $result->fetch_assoc();
+
+        // Stocker les informations de l'utilisateur dans la session
+        $_SESSION["user"] = array(
+            "username" => $user["username"],
+            "name" => $user["name"],
+            "role" => $user["role"]
+            // Ajoutez d'autres informations si nécessaire
+        );
+    } else {
+        echo "Utilisateur non trouvé.";
     }
-
-    
-
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr" >
@@ -51,13 +70,6 @@ session_start(); // Assurez-vous que cette ligne est présente avant toute utili
   <div class="demo-page-navigation mon-demo">
       <nav>
         <ul>
-          <li>
-            <a href="http://localhost:81/demande/app/views/formulaire.php">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-            </svg>
-              Insérer une demande</a>
-          </li>
           <li>
             <a href="liste_demande.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
@@ -106,7 +118,7 @@ session_start(); // Assurez-vous que cette ligne est présente avant toute utili
               Voir la liste des SFD</a>
           </li>
           <li>
-            <a href="#reset">
+            <a href="deconnexion.php">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-power">
                 <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
                 <line x1="12" y1="2" x2="12" y2="12" />
@@ -117,16 +129,19 @@ session_start(); // Assurez-vous que cette ligne est présente avant toute utili
       </nav>
     </div>
     <main class="demo-page-content col-12 centered-form">
-      <section>
-      
+    <section>
+    <div class="container-fluid">
+        <?php if (isset($_SESSION["user"])) : ?>
+            <h1>Profil de <?= $_SESSION["user"]["username"] ?> </h1>
+            <p>Nom : <?= $_SESSION["user"]["name"] ?> </p>
+            <p>Rôle : <?= $_SESSION["user"]["role"] ?></p>
+        <?php else : ?>
+            <p>Aucune information d'utilisateur trouvée.</p>
+        <?php endif; ?>
+    </div>
+</section>
 
-
-<div class="container-fluid">
-      <h1> Profile de <?= $_SESSION["user"]["username"]?> </h1>
-      <p>pseudo : <?= $_SESSION["user"]["pseudo"]?> </p>
-      <p>Email : <?= $_SESSION["user"]["email"]?></p>
-      </div> 
-</section>  
+    </main> 
 </body>
 </html>
 
