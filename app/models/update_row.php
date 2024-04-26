@@ -1,57 +1,52 @@
 <?php
+// Inclure le fichier de connexion à la base de données une seule fois
 require_once('Database.php');
 
-// Assurez-vous que les données POST ont été reçues correctement
+// Vérifiez si les données du formulaire ont été envoyées via la méthode POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer les données éditées du formulaire
-    $id_demande = $_POST['id_demande'];
-    $nature = $_POST['Nature'];
-    $theme = $_POST['Theme'];
-    $date_demande = $_POST['Date_demande'];
-    $quantite = $_POST['Quantite'];
-    $cout_appui = $_POST['Cout_appui'];
-    $nombre_homme_elu = $_POST['Nombre_homme_elu'];
-    $nombre_femme_elu = $_POST['Nombre_femme_elu'];
-    $nombre_homme_personnel = $_POST['Nombre_homme_personnel'];
-    $nombre_femme_personnel = $_POST['Nombre_femme_personnel'];
-    $observation = $_POST['Observation'];
-
-
-    // Préparez votre requête SQL pour mettre à jour la demande
-    $sql = "UPDATE demande_appui SET 
-                        Nature = ?,
-                        Theme = ?,
-                        Date_demande = ?,
-                        /* Region = ?, */
-                        /* Departement = ?, */
-                        Quantite = ?,
-                        Cout_appui = ?,
-                        Nombre_homme_elu = ?,
-                        Nombre_femme_elu = ?,
-                        Nombre_homme_personnel = ?,
-                        Nombre_femme_personnel = ?,
-                        Observation = ?
-                    WHERE id_demande = ?";
-;
-
-    // Préparez et exécutez la déclaration
-    $stmt = $connexion->prepare($sql);
-    $stmt->bind_param("sssssiddiii", 
-        $nature, $theme, $date_demande, 
-        $quantite, $cout_appui, $nombre_homme_elu, $nombre_femme_elu, 
-        $nombre_homme_personnel, $nombre_femme_personnel, $observation, $id_demande
-    );
-
-    // Assurez-vous que les valeurs sont correctement liées et exécutez la requête
-    if ($stmt->execute()) {
-        // La demande a été mise à jour avec succès
-        echo "success";
+    // Assurez-vous que les données nécessaires sont présentes
+    if (isset($_POST['id_demande']) && isset($_POST['nature']) && isset($_POST['theme']) && isset($_POST['date_demande']) && isset($_POST['quantite']) && isset($_POST['cout_appui']) && isset($_POST['NbreHElu']) && isset($_POST['NbreFElu']) && isset($_POST['NbreHPers']) && isset($_POST['NbreFPers']) && isset($_POST['observation'])) {
+        
+        // Récupérez les données du formulaire
+        $id_demande = $_POST['id_demande'];
+        $nature = $_POST['nature'];
+        $theme = $_POST['theme'];
+        $date_demande = $_POST['date_demande'];
+        $quantite = $_POST['quantite'];
+        $cout_appui = $_POST['cout_appui'];
+        $NbreHElu = $_POST['NbreHElu'];
+        $NbreFElu = $_POST['NbreFElu'];
+        $NbreHPers = $_POST['NbreHPers'];
+        $NbreFPers = $_POST['NbreFPers'];
+        $observation = $_POST['observation'];
+        
+        // Créer une instance de la connexion à la base de données
+        $database = new Database();
+        $connexion = $database->getConnection();
+        
+        // Préparer la requête SQL d'UPDATE
+        $sql = "UPDATE demande_appui SET Nature=?, Theme=?, Date_demande=?, Quantite=?, Cout_appui=?, Nombre_homme_elu=?, Nombre_femme_elu=?, Nombre_homme_personnel=?, Nombre_femme_personnel=?, Observation=? WHERE id_demande=?";
+        
+        // Préparer et exécuter la requête SQL
+        $stmt = $connexion->prepare($sql);
+        $stmt->bind_param("ssssssssssi", $nature, $theme, $date_demande, $quantite, $cout_appui, $NbreHElu, $NbreFElu, $NbreHPers, $NbreFPers, $observation, $id_demande);
+        
+        if ($stmt->execute()) {
+            // La mise à jour a réussi
+            echo "Les données ont été mises à jour avec succès.";
+        } else {
+            // La mise à jour a échoué
+            echo "Erreur lors de la mise à jour des données : " . $connexion->error;
+        }
+        
+        // Fermer la requête et la connexion à la base de données
+        $stmt->close();
+        $connexion->close();
     } else {
-        // Il y a eu une erreur lors de la mise à jour de la demande
-        echo "error: " . $stmt->error;
+        // Données manquantes dans la requête POST
+        echo "Toutes les données nécessaires n'ont pas été fournies.";
     }
-
-    // Fermez la déclaration et la connexion à la base de données
-    $stmt->close();
-    $connexion->close();
+} else {
+    // La requête n'est pas de type POST
+    echo "Cette page ne peut être accédée directement.";
 }

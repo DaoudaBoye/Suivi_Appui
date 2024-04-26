@@ -200,18 +200,10 @@ body {
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/user/formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-            </li>
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> À propos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#"><i class="fas fa-envelope"></i> Contact</a>
+            <!-- <li class="nav-item active">
+              <a class="nav-link" href="http://localhost:81/suiviAppui/app/views//formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
             </li> -->
-            <!-- <li class="nav-item">
-              <a class="nav-link" href="#"><i class="fas fa-user"></i> Mon compte</a>
-            </li> -->
+
             <div class="profile">
             <img src="../user.png" alt="Icône de profil">
             <span><?php echo $_SESSION['name']; ?></span>
@@ -327,28 +319,18 @@ body {
                     <table class="table table-striped table-bordered">
                       <thead class="thead-dark">
                         <tr>
-                          <!-- <th scope="col">id_demande</th> -->
-                          <!-- <th scope="col">Beneficiaire</th> -->
                           <th scope="col">nomBeneficiaire</th>
                           <th scope="col">Type_appui</th>
                           <th scope="col">Type_activite</th>
-                          <!-- <th scope="col">Nature</th> -->
                           <th scope="col">date_demande</th>
-                          <!-- <th scope="col">date_validation</th> -->
-                          <!-- <th scope="col">Region_beneficiaire</th> -->
                           <th scope="col">Departement_beneficiaire</th>
                           <th scope="col">Détails</th>
-
-                          <!-- <th scope="col">Quantite(nombre)</th>
-                          <th scope="col">Cout_appui</th>
-                          <th scope="col">Observation</th> -->
+                          <th scope="col">Action1</th>
+                          <th scope="col">Action2</th>
                         </tr>
                       </thead>
                       <tbody>
                         <?php
-                          // require_once("../models/Database.php") ;
-                      
-                          // $sql = "SELECT * FROM liste_demande_appui";
                           $sql = "SELECT 
                           demande_appui.id_demande,
                           demande_appui.Type_Beneficiaire,
@@ -385,42 +367,31 @@ body {
                           Viser = 0
                       ORDER BY 
                           demande_appui.Date_demande DESC;";
-                            
-    
+                              
                           $result = $connexion->query($sql);
 
                           if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 echo "<tr>";
-
-                                // echo "<th scope='row'>" . $row["id_demande"] . "</th>";
-                                // echo "<td>" . $row["Type_Beneficiaire"] . "</td>";
                                 echo "<td>" . $row["Nom_Beneficiaire"] . "</td>";
                                 echo "<td>" . $row["Nom_appui"] . "</td>";
                                 echo "<td>" . $row["Nom_activite"] . "</td>";
-                                // echo "<td>" . $row["Nature"] . "</td>";
                                 echo "<td>" . $row["Date_demande"] . "</td>";
-                                // echo "<td>" . $row["Date_validation"] . "</td>";
-                                // echo "<td>" . $row["Region"] . "</td>";
                                 echo "<td>" . $row["Departement"] . "</td>";
-                                // echo "<td>" . $row["Quantite"] . "</td>";
-                                // echo "<td>" . $row["Cout_appui"] . "</td>";
-                                // echo "<td>" . $row["Observation"] . "</td>";
                              // Ajoutez cette condition autour de l'affichage des boutons dans votre boucle while
-                             echo "<td><button id='btn-viser' class='btn btn-afficher' data-details='" . htmlspecialchars(json_encode($row)) . "'>Détail</button></td>";
+                                echo "<td><button id='btn-viser' class='btn btn-afficher' data-details='" . htmlspecialchars(json_encode($row)) . "'>Détail</button></td>";
 
-                             if ($_SESSION['username'] === 'mamadou.sow@fimf.sn') {
-                              echo "<td><button id='btn-viser-" . $row["id_demande"] . "' class='btn-viser' onclick='confirmViser(" . $row["id_demande"] . ")'>Viser</button></td>";
-                              echo "<td><button type='button' class='btn btn-warning btn-editer'>Éditer</button></td>";
-                          }
+                              if ($_SESSION['username'] === 'mamadou.sow@fimf.sn') {
+                                echo "<td><button id='btn-viser-" . $row["id_demande"] . "' class='btn-viser' onclick='confirmViser(" . $row["id_demande"] . ")'>Viser</button></td>";
+                                echo "<td><button type='button' class='btn btn-warning btn-editer' data-id='" . $row["id_demande"] . "'>Éditer</button></td>";
+                              }
                           
-
                                 echo "</tr>";
                                
+                                }
+                            } else {
+                                echo "<tr><td colspan='13'>Aucun résultat</td></tr>";
                             }
-                        } else {
-                            echo "<tr><td colspan='13'>Aucun résultat</td></tr>";
-                        }
                         
                           $connexion->close();
                         ?>
@@ -451,107 +422,7 @@ body {
                       </div>
                     </div>
                   </div>
-
-
-
-                  <!-- Boîte modale pour l'édition -->
-                  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="editModalLabel">Édition de la demande</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <!-- Formulaire d'édition -->
-                          <form id="editForm">
-                    <div class="nice-form-group">
-                      <label for="editIdDemande">Id demande</label>
-                      <input type="text" id="editIdDemande" class="form-control" placeholder="Id demane" value="' + details.id_demande + '" readonly>
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editTypeBeneficiaire">Type de bénéficiaire</label>
-                      <input type="text" id="editTypeBeneficiaire" class="form-control" placeholder="Type de bénéficiaire" value="' + details.Type_Beneficiaire + '" readonly>
-                    </div>
-                    <!-- <div class="form-group">
-                      <label for="editAgrement">Agrement</label>
-                      <input type="text" id="editAgrement" class="form-control" placeholder="Agrement" value="' + details.Agrement + '">
-                    </div> -->
-                    <div class="nice-form-group">
-                      <label for="editNomBeneficiaire">Nom du bénéficiaire</label>
-                      <input type="text" id="editNomBeneficiaire" class="form-control" placeholder="Nom du bénéficiaire" value="' + details.Nom_Beneficiaire + '" readonly>
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editTypeAppui">Type d\'appui</label>
-                      <input type="text" id="editTypeAppui" class="form-control" placeholder="Type d\'appui" value="' + details.Nom_appui + '" readonly>
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editTypeActivite">Type d\'activité</label>
-                      <input type="text" id="editTypeActivite" class="form-control" placeholder="Type d\'activité" value="' + details.Nom_activite + '" readonly>
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editNature">Nature</label>
-                      <input type="text" id="editNature" class="form-control" placeholder="Nature" value="' + details.Nature + '">
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editTheme">Theme</label>
-                      <input type="text" id="editTheme" class="form-control" placeholder="Theme" value="' + details.Theme + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editDateDemande">Date de demande</label>
-                      <input type="date" id="editDateDemande" class="form-control" placeholder="Date de demande" value="' + details.Date_demande + '">
-                  </div>
-                  <!-- <div class="form-group">
-                      <label for="editRegion">Région du bénéficiaire</label>
-                      <input type="text" id="editRegion" class="form-control" placeholder="Région du bénéficiaire" value="' + details.Region + '">
-                  </div>
-                  <div class="form-group">
-                      <label for="editDepartement">Département du bénéficiaire</label>
-                      <input type="text" id="editDepartement" class="form-control" placeholder="Département du bénéficiaire" value="' + details.Departement + '">
-                  </div> -->
-                  <div class="nice-form-group">
-                      <label for="editQuantite">Quantité</label>
-                      <input type="text" id="editQuantite" class="form-control" placeholder="Quantité" value="' + details.Quantite + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editCoutAppui">Cout d'appui</label>
-                      <input type="text" id="editCoutAppui" class="form-control" placeholder="Cout d'appui" value="' + details.Cout_appui + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editNombreHommeElu">Nombre d'homme élu</label>
-                      <input type="text" id="editNombreHommeElu" class="form-control" placeholder="Nombre d'homme élu" value="' + details.Nombre_homme_elu + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editNombreFemmeElu">Nombre de femme élu</label>
-                      <input type="text" id="editNombreFemmeElu" class="form-control" placeholder="Nombre de femme élu" value="' + details.Nombre_femme_elu + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editNombreHommePersonnel">Nombre d'homme personnel</label>
-                      <input type="text" id="editNombreHommePersonnel" class="form-control" placeholder="Nombre d'homme personnel" value="' + details.Nombre_homme_personnel + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editNombreFemmePersonnel">Nombre de femme personnel</label>
-                      <input type="text" id="editNombreFemmePersonnel" class="form-control" placeholder="Nombre de femme personnel" value="' + details.Nombre_femme_personnel + '">
-                  </div>
-                  <div class="nice-form-group">
-                      <label for="editObservation">Observation</label>
-                      <textarea id="editObservation" class="form-control" placeholder="Observation">' + details.Observation + '</textarea>
-                  </div>
-                  </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="saveChangesBtn">Enregistrer les modifications</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-                  
+     
                     </table>
                     <!-- Ajoute un élément div pour les boutons de pagination -->
 
@@ -722,11 +593,7 @@ body {
                 // Capturer les données éditées du formulaire
                 var editedData = {
                     id_demande: $('#editIdDemande').val(),
-                    // Nom_Beneficiaire: $('#editNomBeneficiaire').val(),
-                    // Type_Beneficiaire: $('#editTypeBeneficiaire').val(),
-                    // Agrement: $('#editAgrement').val(),
-                    // Nom_appui: $('#editTypeAppui').val(),
-                    // Nom_activite: $('#editTypeActivite').val(),
+                   
                     Nature: $('#editNature').val(),
                     Theme: $('#editTheme').val(),
                     Date_demande: $('#editDateDemande').val(),
@@ -743,22 +610,6 @@ body {
 
                 console.log("Données éditées:", editedData); // Vérifiez si les données sont correctes
 
-                // Envoi des données éditées au serveur pour la mise à jour
-            $.ajax({
-                url: '../../models/update_row.php', // Chemin vers le script PHP pour la mise à jour
-                type: 'POST',
-                data: editedData,
-                success: function(response) {
-                    // Gérer la réponse du serveur
-                    alert('La demande a été mise à jour avec succès !');
-                    $('#editModal').modal('hide'); // Cacher la boîte modale après la mise à jour
-                    // Actualiser la page ou effectuer d'autres actions si nécessaire
-                },
-                error: function(xhr, status, error) {
-                    // Gérer les erreurs lors de la requête AJAX
-                    alert('Erreur lors de la mise à jour de la demande. Veuillez réessayer !');
-                }
-                });
             });
 
             // Gérer le clic sur le bouton "Détail"
@@ -806,6 +657,15 @@ body {
 
         }
     });
+
+
+    $(document).ready(function() {
+    $('.btn-editer').click(function() {
+        var id_demande = $(this).data('id');
+        window.location.href = 'editer.php?id_demande=' + id_demande;
+    });
+});
+
 
 </script>
 

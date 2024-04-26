@@ -3,73 +3,89 @@ require_once('C:/xampp/htdocs/suiviAppui/app/auth/check_session.php');
 require_once('C:/xampp/htdocs/suiviAppui/app/models/Database.php');
 require_once('C:/xampp/htdocs/suiviAppui/app/models/actionModel.php');
 
+// Création d'une instance de la classe Database pour obtenir la connexion à la base de données
 $database = new Database();
 $connexion = $database->getConnection();
 
+// Vérification de la connexion
 if ($connexion->connect_error) {
     die("Échec de la connexion : " . $connexion->connect_error);
 }
 
-$id_demande = $_GET['id_demande'];
-$selSQL = "SELECT * FROM `demande_appui` WHERE id_demande = $id_demande";
-$res = mysqli_query($connexion, $selSQL);
-$r = mysqli_fetch_assoc($res);
+// Vérifier si l'identifiant de la demande est valide
+if (!empty($_GET['id_demande'])) {
+    // Récupérer l'identifiant de la demande depuis l'URL
+    $id_demande = htmlspecialchars($_GET['id_demande']);
 
+    // Préparez la requête SQL pour récupérer les informations de la demande et les données liées
+    $sql = "SELECT 
+                demande_appui.id_demande,
+                demande_appui.Type_Beneficiaire,
+                demande_appui.Nom_Beneficiaire,
+                demande_appui.Nature,
+                demande_appui.Theme,
+                demande_appui.Date_demande,
+                type_appui.Nom_appui AS TypeAppui,
+                type_activite.Nom_activite AS TypeActivite,
+                demande_appui.Quantite,
+                demande_appui.Cout_appui,
+                demande_appui.Nombre_homme_elu,
+                demande_appui.Nombre_femme_elu,
+                demande_appui.Nombre_homme_personnel,
+                demande_appui.Nombre_femme_personnel,
+                demande_appui.Observation
+            FROM 
+                demande_appui
+            LEFT JOIN 
+                type_activite ON demande_appui.id_activite = type_activite.id_activite
+            LEFT JOIN 
+                type_appui ON type_activite.id_appui = type_appui.id_appui
+            WHERE 
+                demande_appui.id_demande = ?";
 
-// Traitement du formulaire de mise à jour après soumission
-if (isset($_POST) && !empty($_POST)) {
-    // Récupérez les données soumises via le formulaire
-    $id_demande = $_POST['id_demande']; // Assurez-vous de récupérer l'ID de la demande à mettre à jour
-    $beneficiaire = $_POST['beneficiaire'];
-    $nomBeneficiaire = $_POST['nomBeneficiaire'];
-    $type_appui = $_POST['type_appui'];
-    $typeActivite = $_POST['typeActivite'];
-    $Nature = $_POST['Nature'];
-    $Theme = $_POST['Theme'];
-    $NbreEluH = $_POST['NbreEluH'];
-    $NbreEluF = $_POST['NbreEluF'];
-    $NbrePersH = $_POST['NbrePersH'];
-    $NbrePersF = $_POST['NbrePersF'];
-    $date_demande = $_POST['date_demande'];
-    $Cout_appui = $_POST['Cout_appui'];
-    $Qt_equi_oct = $_POST['Qt_equi_oct'];
-    $observation = $_POST['observation'];
-
-    // Préparez la requête de mise à jour
-    $UpdateDemande = "UPDATE demande_appui 
-        SET Type_Beneficiaire = ?, 
-            Nom_Beneficiaire = ?, 
-            Agrement = ?, 
-            id_structure = ?, 
-            id_activite = ?, 
-            Nature = ?, 
-            Theme = ?, 
-            Nombre_homme_elu = ?, 
-            Nombre_femme_elu = ?, 
-            Nombre_homme_personnel = ?, 
-            Nombre_femme_personnel = ?, 
-            Date_demande = ?, 
-            Quantite = ?, 
-            Cout_appui = ?, 
-            Observation = ? 
-        WHERE id_demande = ?";
-    
-    // Assurez-vous que $connexion est votre objet de connexion à la base de données
-
-    $stmt = $connexion->prepare($UpdateDemande);
-    $stmt->bind_param("ssiiisssiiisidssi", $beneficiaire, $nomBeneficiaire, $type_appui, $typeActivite, $Nature, $Theme, $NbreEluH, $NbreEluF, $NbrePersH, $NbrePersF, $date_demande, $Cout_appui, $Qt_equi_oct, $observation, $id_demande);
+    // Préparez et exécutez la requête
+    $stmt = $connexion->prepare($sql);
+    $stmt->bind_param("i", $id_demande);
     $stmt->execute();
 
-    if ($stmt->affected_rows > 0) {
-        // La mise à jour a réussi
-        header("Location: adminConfirm.php");
-        exit;
+    // Récupérez le résultat de la requête
+    $result = $stmt->get_result();
+
+    // Vérifiez s'il y a des lignes retournées
+    if ($result->num_rows > 0) {
+        // Récupérez les données de la demande
+        $row = $result->fetch_assoc();
+
+      // Pré-remplissez les champs du formulaire avec les informations de la demande
+        $id_demande = $row['id_demande'];
+        $TypeBeneficiaire = $row['Type_Beneficiaire'];
+        $NomBeneficiaire = $row['Nom_Beneficiaire'];
+        $TypeAppui = $row['TypeAppui'];
+        $TypeActivite = $row['TypeActivite'];
+
+        $nature = $row['Nature'];
+        $theme = $row['Theme'];
+        $date_demande = $row['Date_demande'];
+        $quantite = $row['Quantite'];
+        $cout_appui = $row['Cout_appui'];
+        $NbreHElu = $row['Nombre_homme_elu']; // Correction ici
+        $NbreFElu = $row['Nombre_femme_elu']; // Correction ici
+        $NbreHPers = $row['Nombre_homme_personnel']; // Correction ici
+        $NbreFPers = $row['Nombre_femme_personnel']; // Correction ici
+        $Observation = $row['Observation']; // Correction ici
+
+        // Fermez la requête et la connexion à la base de données
+        $stmt->close();
+        $connexion->close();
     } else {
-        // La mise à jour a échoué
-        $erreur = "La mise à jour a échoué";
+        echo "Aucune demande trouvée avec cet identifiant.";
     }
+} else {
+    echo "Identifiant de demande non spécifié.";
 }
 ?>
+
+
 
 
 
@@ -180,9 +196,9 @@ body {
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
+            <!-- <li class="nav-item active">
               <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/user/formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-            </li>
+            </li> -->
             <!-- <li class="nav-item">
               <a class="nav-link" href="#"><i class="fas fa-info-circle"></i> À propos</a>
             </li>
@@ -288,85 +304,44 @@ body {
     </div>
     <main class="demo-page-content">
 
-      <section>
-        <form id="myForm" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" onsubmit="return validateForm()">
-        <input type="hidden" value="<?php echo $id_demande; ?>">
-          <div class="href-target" id="input-types"></div>
-          <h1>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-align-justify">
-              <line x1="21" y1="10" x2="3" y2="10" />
-              <line x1="21" y1="6" x2="3" y2="6" />
-              <line x1="21" y1="14" x2="3" y2="14" />
-              <line x1="21" y1="18" x2="3" y2="18" />
-            </svg>
-            Enregistrer votre demande
-          </h1>
-          <p>Veuillez renseignez tous les champs svp !</p>
-          
-          <div class="nice-form-group">
-          <?php if (isset($_SESSION['success_message'])) : ?>
-        <div class="alert alert-success" role="alert">
-            <?php echo $_SESSION['success_message']; ?>
-        </div>
-        <?php unset($_SESSION['success_message']); ?>
-    <?php endif; ?>
+    <section>
+    <form id="editForm">
+    <div class="nice-form-group">
+    <label for="editIdDemande">Id demande</label>
+    <input type="text" id="editIdDemande" class="form-control" placeholder="Id demande" value="<?php echo $id_demande ?? ''; ?>" readonly>
+    </div>
+    <div class="nice-form-group">
+        <label for="editTypeBeneficiaire">Type de bénéficiaire</label>
+        <input type="text" id="editTypeBeneficiaire" class="form-control" placeholder="Type de bénéficiaire" value="<?php echo $TypeBeneficiaire ?? ''; ?>" readonly>
+    </div>
+    <!-- <div class="form-group">
+        <label for="editAgrement">Agrement</label>
+        <input type="text" id="editAgrement" class="form-control" placeholder="Agrement" value="' + details.Agrement + '">
+    </div> -->
+    <div class="nice-form-group">
+        <label for="editNomBeneficiaire">Nom du bénéficiaire</label>
+        <input type="text" id="editNomBeneficiaire" class="form-control" placeholder="Nom du bénéficiaire" value="<?php echo $NomBeneficiaire ?? ''; ?>" readonly>
+    </div>
+    <div class="nice-form-group">
+        <label for="editTypeAppui">Type d'appui</label>
+        <input type="text" id="editTypeAppui" class="form-control" placeholder="Type d'appui" value="<?php echo $TypeAppui ?? ''; ?>" readonly>
+    </div>
 
-    <?php if (isset($_SESSION['error_message'])) : ?>
-        <div class="alert alert-danger" role="alert">
-            <?php echo $_SESSION['error_message']; ?>
-        </div>
-        <?php unset($_SESSION['error_message']); ?>
-    <?php endif; ?>
-            
-
-                            <!-- Boîte modale pour l'édition -->
-                            <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="editModalLabel">Édition de la demande</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          <!-- Formulaire d'édition -->
-                          <form id="editForm">
-                    <div class="nice-form-group">
-                      <label for="editIdDemande">Id demande</label>
-                      <input type="text" id="editIdDemande" class="form-control" placeholder="Id demane" value="' + details.id_demande + '" readonly>
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editTypeBeneficiaire">Type de bénéficiaire</label>
-                      <input type="text" id="editTypeBeneficiaire" class="form-control" placeholder="Type de bénéficiaire" value="' + details.Type_Beneficiaire + '">
-                    </div>
-                    <!-- <div class="form-group">
-                      <label for="editAgrement">Agrement</label>
-                      <input type="text" id="editAgrement" class="form-control" placeholder="Agrement" value="' + details.Agrement + '">
-                    </div> -->
-                    <div class="nice-form-group">
-                      <label for="editNomBeneficiaire">Nom du bénéficiaire</label>
-                      <input type="text" id="editNomBeneficiaire" class="form-control" placeholder="Nom du bénéficiaire" value="' + details.Nom_Beneficiaire + '">
-                    </div>
-                    <div class="nice-form-group">
-                      <label for="editTypeAppui">Type d\'appui</label>
-                      <input type="text" id="editTypeAppui" class="form-control" placeholder="Type d\'appui" value="' + details.Nom_appui + '">
-                    </div>
                     <div class="nice-form-group">
                       <label for="editTypeActivite">Type d\'activité</label>
-                      <input type="text" id="editTypeActivite" class="form-control" placeholder="Type d\'activité" value="' + details.Nom_activite + '">
+                      <input type="text" id="editTypeActivite" class="form-control" placeholder="Type d\'activité" value="<?php echo $TypeActivite ?? ''; ?>" readonly>
                     </div>
                     <div class="nice-form-group">
                       <label for="editNature">Nature</label>
-                      <input type="text" id="editNature" class="form-control" placeholder="Nature" value="' + details.Nature + '">
+                      <input type="text" id="editNature" class="form-control" placeholder="Nature" value="<?php echo $nature ?? ''; ?>">
                     </div>
                     <div class="nice-form-group">
                       <label for="editTheme">Theme</label>
-                      <input type="text" id="editTheme" class="form-control" placeholder="Theme" value="' + details.Theme + '">
+                      <input type="text" id="editTheme" class="form-control" placeholder="Theme" value="<?php echo $theme ?? ''; ?>">
                   </div>
                   <div class="nice-form-group">
                       <label for="editDateDemande">Date de demande</label>
-                      <input type="date" id="editDateDemande" class="form-control" placeholder="Date de demande" value="' + details.Date_demande + '">
+                      <input type="date" id="editDateDemande" class="form-control" placeholder="Date de demande" value="<?php echo $date_demande ?? ''; ?>">
                   </div>
                   <!-- <div class="form-group">
                       <label for="editRegion">Région du bénéficiaire</label>
@@ -378,48 +353,39 @@ body {
                   </div> -->
                   <div class="nice-form-group">
                       <label for="editQuantite">Quantité</label>
-                      <input type="text" id="editQuantite" class="form-control" placeholder="Quantité" value="' + details.Quantite + '">
+                      <input type="text" id="editQuantite" class="form-control" placeholder="Quantité" value="<?php echo $quantite ?? ''; ?>">
                   </div>
                   <div class="nice-form-group">
                       <label for="editCoutAppui">Cout d'appui</label>
-                      <input type="text" id="editCoutAppui" class="form-control" placeholder="Cout d'appui" value="' + details.Cout_appui + '">
+                      <input type="text" id="editCoutAppui" class="form-control" placeholder="Cout d'appui" value="<?php echo $cout_appui ?? ''; ?>">
                   </div>
                   <div class="nice-form-group">
                       <label for="editNombreHommeElu">Nombre d'homme élu</label>
-                      <input type="text" id="editNombreHommeElu" class="form-control" placeholder="Nombre d'homme élu" value="' + details.Nombre_homme_elu + '">
+                      <input type="text" id="editNombreHommeElu" class="form-control" placeholder="Nombre d'homme élu" value="<?php echo $NbreHElu ?? ''; ?>">
                   </div>
                   <div class="nice-form-group">
                       <label for="editNombreFemmeElu">Nombre de femme élu</label>
-                      <input type="text" id="editNombreFemmeElu" class="form-control" placeholder="Nombre de femme élu" value="' + details.Nombre_femme_elu + '">
+                      <input type="text" id="editNombreFemmeElu" class="form-control" placeholder="Nombre de femme élu" value="<?php echo $NbreFElu ?? ''; ?>">
                   </div>
                   <div class="nice-form-group">
                       <label for="editNombreHommePersonnel">Nombre d'homme personnel</label>
-                      <input type="text" id="editNombreHommePersonnel" class="form-control" placeholder="Nombre d'homme personnel" value="' + details.Nombre_homme_personnel + '">
+                      <input type="text" id="editNombreHommePersonnel" class="form-control" placeholder="Nombre d'homme personnel" value="<?php echo $NbreHPers ?? ''; ?>">
                   </div>
                   <div class="nice-form-group">
                       <label for="editNombreFemmePersonnel">Nombre de femme personnel</label>
-                      <input type="text" id="editNombreFemmePersonnel" class="form-control" placeholder="Nombre de femme personnel" value="' + details.Nombre_femme_personnel + '">
+                      <input type="text" id="editNombreFemmePersonnel" class="form-control" placeholder="Nombre de femme personnel" value="<?php echo $NbreFPers ?? ''; ?>">
                   </div>
+                  
                   <div class="nice-form-group">
                       <label for="editObservation">Observation</label>
-                      <textarea id="editObservation" class="form-control" placeholder="Observation">' + details.Observation + '</textarea>
+                      <textarea id="editObservation" class="form-control" placeholder="Observation"><?php echo $Observation ?? ''; ?></textarea>
+                  </div>
+                  <!-- Boutons -->
+                  <div class="nice-form-group">
+                      <button type="button" class="btn btn-success" style="background-color: green;" id="btnUpdate">Mettre à jour</button>
+                      <button type="button" class="btn btn-secondary" id="btnCancel">Annuler</button>
                   </div>
                   </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="saveChangesBtn">Enregistrer les modifications</button>
-              </div>
-            </div>
-          </div>
-        </div>
-         
-
-
-         
-
-        
-        </form>
         <!-- <div id="alertMessage" style="display: <?php echo isset($_SESSION['success_message']) ? 'block' : 'none'; ?>"> -->
   
 
@@ -503,6 +469,64 @@ body {
         }
     });
 
+   
+
+
+
+    document.getElementById('btnUpdate').addEventListener('click', function() {
+    // Collecte des données du formulaire
+    var id_demande = document.getElementById('editIdDemande').value;
+    var nature = document.getElementById('editNature').value;
+    var theme = document.getElementById('editTheme').value;
+    var date_demande = document.getElementById('editDateDemande').value;
+    var quantite = document.getElementById('editQuantite').value;
+    var cout_appui = document.getElementById('editCoutAppui').value;
+    var NbreHElu = document.getElementById('editNombreHommeElu').value;
+    var NbreFElu = document.getElementById('editNombreFemmeElu').value;
+    var NbreHPers = document.getElementById('editNombreHommePersonnel').value;
+    var NbreFPers = document.getElementById('editNombreFemmePersonnel').value;
+    var observation = document.getElementById('editObservation').value;
+
+    // Création d'un objet FormData pour envoyer les données au serveur
+    var formData = new FormData();
+    formData.append('id_demande', id_demande);
+    formData.append('nature', nature);
+    formData.append('theme', theme);
+    formData.append('date_demande', date_demande);
+    formData.append('quantite', quantite);
+    formData.append('cout_appui', cout_appui);
+    formData.append('NbreHElu', NbreHElu);
+    formData.append('NbreFElu', NbreFElu);
+    formData.append('NbreHPers', NbreHPers);
+    formData.append('NbreFPers', NbreFPers);
+    formData.append('observation', observation);
+
+    // Envoi de la requête AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+                // Succès : mettez en œuvre toute logique supplémentaire nécessaire
+                console.log(xhr.responseText);
+                alert("Données mises à jour avec succès !");
+                // Vous pouvez rediriger l'utilisateur vers une autre page ou effectuer d'autres actions ici
+                window.location.href = "../../views/suiviEvaluation/adminConfirm.php";
+
+            } else {
+                // Gérer les erreurs éventuelles
+                console.error('Une erreur s\'est produite : ' + xhr.status);
+                alert("Erreur lors de la mise à jour des données.");
+            }
+        }
+    };
+    xhr.open('POST', '../../models/update_row.php', true);
+    xhr.send(formData);
+});
+
+document.getElementById('btnCancel').addEventListener('click', function() {
+    // Redirection vers la page d'administration
+    window.location.href = "../../views/suiviEvaluation/adminConfirm.php";
+});
 
 
 </script>

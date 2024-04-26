@@ -124,9 +124,9 @@ if (isset($_POST['register'])) {
 
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
+            <!-- <li class="nav-item active">
               <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/dashbord.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-            </li>
+            </li> -->
            
 
            

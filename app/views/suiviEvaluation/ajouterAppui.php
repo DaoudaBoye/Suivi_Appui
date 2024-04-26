@@ -114,9 +114,9 @@ body.dark-theme .navbar {
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
+            <!-- <li class="nav-item active">
               <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/user/formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-            </li>
+            </li> -->
             <div class="profile">
             <img src="../user.png" alt="Icône de profil">
             <span><?php echo $_SESSION['name']; ?></span>

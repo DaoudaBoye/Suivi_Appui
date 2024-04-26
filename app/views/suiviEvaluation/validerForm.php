@@ -163,9 +163,9 @@ body.dark-theme .navbar {
       </div>
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
+            <!-- <li class="nav-item active">
               <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/suiviEvaluation/adminConfirm.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-            </li>
+            </li> -->
           
             <div class="profile">
             <img src="../user.png" alt="Icône de profil">
@@ -288,24 +288,13 @@ body.dark-theme .navbar {
                           <th scope="col">nomBeneficiaire</th>
                           <th scope="col">Type_appui</th>
                           <th scope="col">Type_activite</th>
-                          <!-- <th scope="col">Nature</th> -->
                           <th scope="col">date_demande</th>
-                          <!-- <th scope="col">date_validation</th> -->
-                          <!-- <th scope="col">Region_beneficiaire</th> -->
                           <th scope="col">Departement_beneficiaire</th>
                           <th scope="col">Détails</th>
-
-                          <!-- <th scope="col">Quantite(nombre)</th>
-                          <th scope="col">Cout_appui</th>
-                          <th scope="col">Observation</th> -->
                         </tr>
                       </thead>
                       <tbody>
                       <?php
-                                // require_once("../models/Database.php") ;
-
-                                 // require_once("../models/Database.php") ;
-
                                  $sql = "SELECT 
                                   demande_appui.Type_Beneficiaire,
                                   demande_appui.Nom_Beneficiaire,
@@ -352,20 +341,11 @@ body.dark-theme .navbar {
                             
                                 echo "<tr>";
                                 echo "<td><i class='fas fa-check' style='color: green;'></i></td>";
-                                
-                                // echo "<th scope='row'>" . $row["id_demande"] . "</th>";
-                                // echo "<td>" . $row["Type_Beneficiaire"] . "</td>";
                                 echo "<td>" . $row["Nom_Beneficiaire"] . "</td>";
                                 echo "<td>" . $row["Nom_appui"] . "</td>";
                                 echo "<td>" . $row["Nom_activite"] . "</td>";
-                                // echo "<td>" . $row["Nature"] . "</td>";
                                 echo "<td>" . $row["Date_demande"] . "</td>";
-                                // echo "<td>" . $row["Date_validation"] . "</td>";
-                                // echo "<td>" . $row["Region"] . "</td>";
                                 echo "<td>" . $row["Departement"] . "</td>";
-                                // echo "<td>" . $row["Quantite"] . "</td>";
-                                // echo "<td>" . $row["Cout_appui"] . "</td>";
-                                // echo "<td>" . $row["Observation"] . "</td>";
                                 echo "<td><button id='btn-viser' class='btn btn-afficher' data-details='" . htmlspecialchars(json_encode($row)) . "'>Détail</button></td>";
 
                                 echo "</tr>";

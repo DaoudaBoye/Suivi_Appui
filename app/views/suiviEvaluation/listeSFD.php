@@ -38,7 +38,6 @@ if ($connexion->connect_error) {
     body {
         padding-top: 60px; /* Ajustez la valeur selon la hauteur de votre barre de navigation */
     }
-
     
     /* Styles pour le mode sombre */
 body.dark-theme {
@@ -106,9 +105,9 @@ body.dark-theme .navbar {
   </div>
   <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
+        <!-- <li class="nav-item active">
           <a class="nav-link" href="formulaire.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-        </li>
+        </li> -->
         <div class="profile">
             <img src="../user.png" alt="Icône de profil">
             <span><?php echo $_SESSION['name']; ?></span> 
@@ -226,7 +225,8 @@ body.dark-theme .navbar {
                           <th scope="col">Contat</th>
                           <th scope="col">Region</th>
                           <th scope="col">departement</th>
-                          
+                          <th scope="col">Action</th>
+
                         </tr>
                       </thead>
                       <tbody>
@@ -255,9 +255,7 @@ body.dark-theme .navbar {
                                 echo "<td>" . $row["Contact"] . "</td>";
                                 echo "<td>" . $row["Region"] . "</td>";
                                 echo "<td>" . $row["Departement"] . "</td>";
-                                echo "<td>
-                                      <a href='javascript:void(0);' onclick='editRow(this)'><i class='fas fa-edit' style='color:#555'></i></a>
-                                    </td>";
+                                echo "<td><button type='button' class='btn btn-warning btn-editer' data-id='" . $row["Agrement"] . "'>Éditer</button></td>";
                                 echo "</tr>";
                                
                             }

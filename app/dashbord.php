@@ -1,10 +1,7 @@
 <?php
-// session_start();
-require_once('C:/xampp/htdocs/suiviAppui/app/auth/check_session.php');
-
+session_start();
 // Inclusion du fichier de connexion à la base de données
-require_once('C:/xampp/htdocs/suiviAppui/app/models/Database.php');
-require_once('C:/xampp/htdocs/suiviAppui/app/models/actionModel.php'); // Remplacez Chemin_vers_votre_classe_DemandeModel par le chemin correct de votre classe DemandeModel
+require_once('C:/xampp/htdocs/demande/app/models/Database.php');
 
 // Création d'une instance de la classe Database pour obtenir la connexion à la base de données
 $database = new Database();
@@ -15,24 +12,27 @@ if ($connexion->connect_error) {
     die("Échec de la connexion : " . $connexion->connect_error);
 }
 
-// Vérifiez si l'ID est passé via POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-  $id_demande = $_POST['id'];
+// Vérification si le formulaire a été soumis
+if (isset($_POST['register'])) {
+  // Création d'une instance de la classe DemandeModel
+  require_once('C:/xampp/htdocs/suiviAppui/app/models/sfdModel.php'); // Remplacez Chemin_vers_votre_classe_DemandeModel par le chemin correct de votre classe DemandeModel
+  $sfdModel = new sfdModel();
 
+  // Appel de la méthode insertDemande avec les données du formulaire
+  $result = $sfdModel->enregistrerSFD($_POST);
 
-  $actionModel = new actionModel($connexion); // Passer la connexion à DemandeModel
-  $result = $actionModel->viserDemande($id_demande);
-
-  echo json_encode($result);
+  // Affichage du résultat ou message de réussite ou d'erreur
+  echo $result;
+ 
 }
 
 ?>
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" >
 <head>
   <meta charset="UTF-8">
-  <title>Suivi demandes appuis</title>
+  <title>CodePen - nice-forms.css</title>
   <!-- Vos liens de feuilles de style -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
   <!-- <link rel="stylesheet" href="./style.css">
@@ -43,65 +43,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
   <link href="./plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
-  <link rel="stylesheet" href="../../public/style.css">
+  <link rel="stylesheet" href="../public/style.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="../../public/script.js"></script>
+  <script src="../public/script.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-
-<style>
-  /* Exemple de styles pour les boutons */
-.btn-viser,
-.btn-refuser {
-  color: white; /* Couleur du texte */
-  padding: 10px 20px; /* Espacement interne */
-  border: none; /* Supprime le contour */
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  transition-duration: 0.4s; /* Durée de transition pour les effets */
-  cursor: pointer;
-}
-
-/* Styles pour les boutons en mode confirmation */
-.btn-viser {
-  background-color: #5cb85c; /* Couleur verte */
-  color: white;
-}
-
-/* Styles pour les boutons en mode refus */
-.btn-editer {
-  background-color: #555; /* Couleur rouge */
-  color: white;
-}
-
-
-.btn-editer:hover {
-  background-color: #fff; /* Couleur de fond au survol */
-  color: #000; /* Couleur du texte au survol */
-  border-color: #000;
-}
-/* Effets au survol */
-.btn-viser:hover{
-  background-color: #45a049; /* Couleur de fond au survol */
-  color: white; /* Couleur du texte au survol */
-}
-
-/* Styles pour les boutons désactivés */
-.btn-disabled {
-  opacity: 0.5; /* Réduit l'opacité pour indiquer que le bouton est désactivé */
-  pointer-events: none; /* Désactive les événements pointer pour rendre le bouton non cliquable */
-}
-
-body {
+  <style>
+    body {
         padding-top: 60px; /* Ajustez la valeur selon la hauteur de votre barre de navigation */
     }
 
-
-    
-    /* Exemple de style pour l'icône de profil et le nom de l'utilisateur */
-    .profile {
+/* Exemple de style pour l'icône de profil et le nom de l'utilisateur */
+.profile {
     display: flex;
     align-items: center;
     color: #fff;
@@ -118,135 +70,91 @@ body {
     font-weight: bold;
     font-size: 16px;
 }
+    
+
+#themeToggle {
+    background-color: transparent; /* Fond transparent */
+    border: none; /* Pas de bord */
+    cursor: pointer; /* Curseur de souris en pointeur */
+    outline: none; /* Pas de contour de focus */
+}
+
+#themeIcon {
+    font-size: 24px; /* Taille de l'icône */
+    color: #FFFF00; /* Couleur de l'icône (jaune) */
+    transition: color 0.3s ease; /* Animation de transition de couleur */
+}
+
+
+#themeToggle:hover #themeIcon {
+    color: #666; /* Changement de couleur au survol */
+}
+
+/* Styles pour le mode sombre */
+.dark-mode {
+    background-color: #1a1a1a; /* Couleur de fond sombre */
+    color: #fff; /* Couleur du texte en mode sombre */
+}
+
+/* Styles pour le mode clair */
+.light-mode {
+    background-color: #fff; /* Couleur de fond claire */
+    color: #000; /* Couleur du texte en mode clair */
+}
+
 </style>
+
 </head>
 <body>
-     <!-- Barre de navigation -->
-     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+   <!-- Barre de navigation -->
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
       <a class="navbar-brand" href="#">
-        <img src="../Logo_FIMF.png" alt="Logo" height="40">
+        <img src="Logo_FIMF.png" alt="Logo" height="40">
       </a>
       <!-- Bouton pour afficher le menu sur mobile -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="button-group">
-        <button id="themeToggle">Mode sombre</button>
-      </div>
+      <button id="themeToggle">
+    <i id="themeIcon" class="fas fa-moon"></i> <!-- icône de lune par défaut -->
+</button>
+
+</div>
+
       <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ml-auto">
-            <!-- <li class="nav-item active">
-              <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/suiviEvaluation/adminConfirm.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
-            </li> -->
+            <li class="nav-item active">
+              <a class="nav-link" href="http://localhost:81/suiviAppui/app/views/dashbord.php"><i class="fas fa-home"></i> Accueil <span class="sr-only">(current)</span></a>
+            </li>
+           
 
-            <div class="profile">
-            <img src="../user.png" alt="Icône de profil">
-            <span><?php echo $_SESSION['name']; ?></span>
-        </div>
-          </ul>
+           
+    
+        <li>
+        <a class="nav-link" href="../auth/deconnexion.php">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion <span class="sr-only">(current)</span>
+        </a>
         </div>
     </nav>
-  <div class="demo-page">
-  <div class="demo-page-navigation mon-demo">
-      <nav>
-        <ul>
-          <li>
-            <a href="adminConfirm.php">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers">
-                <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                <polyline points="2 17 12 22 22 17" />
-                <polyline points="2 12 12 17 22 12" />
-              </svg>
-              Voir la liste des demandes</a>
-          </li>
-     
-          <li>
-            <a href="sfdRegister.php">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sliders">
-                <line x1="4" y1="21" x2="4" y2="14" />
-                <line x1="4" y1="10" x2="4" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12" y2="3" />
-                <line x1="20" y1="21" x2="20" y2="16" />
-                <line x1="20" y1="12" x2="20" y2="3" />
-                <line x1="1" y1="14" x2="7" y2="14" />
-                <line x1="9" y1="8" x2="15" y2="8" />
-                <line x1="17" y1="16" x2="23" y2="16" />
-              </svg>
-              Enregistrer un Structure</a>
-          </li>
-          <li>
-            <a href="ajouterAppui.php">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-life-buoy">
-              <circle cx="12" cy="12" r="10"></circle>
-              <circle cx="12" cy="12" r="4"></circle>
-              <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
-              <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
-              <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
-              <line x1="14.83" y1="9.17" x2="18.36" y2="5.64"></line>
-              <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
-            </svg>
-              Ajouter un appui</a>
-          </li>
-          <li>
-            <a href="listeSFD.php">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
-                <line x1="8" y1="6" x2="21" y2="6" />
-                <line x1="8" y1="12" x2="21" y2="12" />
-                <line x1="8" y1="18" x2="21" y2="18" />
-                <line x1="3" y1="6" x2="3.01" y2="6" />
-                <line x1="3" y1="12" x2="3.01" y2="12" />
-                <line x1="3" y1="18" x2="3.01" y2="18" />
-              </svg>
-              Voir la liste des SFD</a>
-          </li>
-          <li>
-            <a href="validerForm.php">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-square">
-              <polyline points="9 11 12 14 22 4"></polyline>
-              <rect x="1" y="1" width="22" height="22" stroke="none" fill="none"></rect>
-            </svg>
-              Demandes validées</a>
-          </li>
-          <li>
-            <a href="http://localhost:81/suiviAppui/app/views/suiviEvaluation/dashbord.php">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2">
-              <line x1="18" y1="20" x2="18" y2="10" />
-              <line x1="12" y1="20" x2="12" y2="4" />
-              <line x1="6" y1="20" x2="6" y2="14" />
-            </svg>
-
-
-              Dashbord</a>
-          </li>
-          <li>
-            <a href="../../auth/deconnexion.php">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-power">
-                <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
-                <line x1="12" y1="2" x2="12" y2="12" />
-              </svg>
-              Déconnexion</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-    <main class="demo-page-content col-12 centered-form">
-      <section>
+  <div class="demo-page my-demo">
+  
+    <main class="demo-page-content col-12 centered-form" >
+    <section style="width: 95vw;">
       <h1 class="card-title" style="text-align: center;">Dashobord</h1>
       <div class="row mb-3">
       
-</div>
+  </div>
 
 
       <div class="container-fluid">
           <div class="row">
             
-          <iframe  title="TestsuiviAppui" width="900" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=9dfb3093-caa9-4dfd-a33f-1f4e89e13362&autoAuth=true&ctid=b3e36c19-f28c-4d0d-b496-8827fe568a51" frameborder="0" allowFullScreen="true"></iframe>  
+          <iframe  title="TestsuiviAppui" width="1100" height="541.25" src="https://app.powerbi.com/reportEmbed?reportId=9dfb3093-caa9-4dfd-a33f-1f4e89e13362&autoAuth=true&ctid=b3e36c19-f28c-4d0d-b496-8827fe568a51" frameborder="0" allowFullScreen="true"></iframe>  
 
           </div>
         </div>
       </section>
-      <footer>Made By ♥ FIMF</footer>
     </main>
   </div>
 
@@ -441,7 +349,31 @@ function viserDemande(idDemande) {
             // Si l'utilisateur annule, ne faites rien
         }
     }
+
+
+
+    const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+
+themeToggle.addEventListener('click', function() {
+    // Basculer entre le mode sombre et le mode clair
+    document.body.classList.toggle('dark-mode');
+
+    // Basculer entre les icônes de lune et de soleil
+    if (themeIcon.classList.contains('fa-moon')) {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun'); // Ajoute l'icône de soleil
+    } else {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon'); // Ajoute l'icône de lune
+    }
+});
+
+
+
 </script>
+
+
 
 <script src="../public/auto_logout.js"></script>
 </body>
